@@ -1,8 +1,13 @@
-"use client";
 import React from 'react';
-import { Activity, Brain, Thermometer, AlertCircle } from 'lucide-react';
+import { Activity, Brain, Thermometer, AlertCircle, LucideIcon } from 'lucide-react';
 
-const FeatureCard = ({ title, description, icon: Icon }) => (
+interface FeatureCardProps {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+}
+
+const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon: Icon }) => (
   <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
     <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-full bg-indigo-500">
       <Icon className="w-6 h-6 text-white" />
@@ -12,7 +17,7 @@ const FeatureCard = ({ title, description, icon: Icon }) => (
   </div>
 );
 
-const Features = () => (
+const Features: React.FC = () => (
   <section id="features" className="min-h-screen flex items-center justify-center bg-black bg-opacity-90 py-12">
     <div className="container mx-auto px-4">
       <h2 className="text-4xl font-bold text-white mb-12 text-center">Our Features</h2>

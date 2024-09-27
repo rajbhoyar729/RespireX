@@ -1,8 +1,8 @@
 import React from 'react';
-import Navbar from './components/navbar';
-import HeroSection from './components/herosection';
-import About from './components/about';
-import Features from './components/features';
+import Navbar from '../components/navbar';
+import HeroSection from '../components/herosection';
+import About from '../components/about';
+import Features from '../components/features';
 
 const Contact = () => (
   <section id="contact" className="min-h-screen flex items-center justify-center bg-black bg-opacity-90">
