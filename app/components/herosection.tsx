@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const HeroSection = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center bg-black bg-opacity-90 text-white py-16 px-4 sm:px-6 lg:px-8">
+    <section className="min-h-screen flex items-center justify-center bg-blue-200 bg-opacity-90 text-white py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
         <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0 animate-fadeInUp">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-yellow-400">
@@ -26,7 +26,7 @@ const HeroSection = () => {
               alt="Lung Image"
               width={500}
               height={500}
-              className="rounded-lg shadow-2xl drop-shadow-custom-yellow animate-float"
+              className="rounded-lg  drop-shadow-custom-yellow animate-float"
             />
           </div>
         </div>

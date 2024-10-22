@@ -22,7 +22,7 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-black bg-opacity-60 backdrop-blur-md shadow-lg' : 'bg-transparent'
+      isScrolled ? 'bg-cyan-800 bg-opacity-90 backdrop-blur-md shadow-lg' :'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -31,7 +31,7 @@ const Navbar = () => {
               to="home"
               smooth={true}
               duration={500}
-              className="text-2xl font-bold tracking-wider bg-gradient-to-r from-yellow-400 to-pink-500 text-transparent bg-clip-text cursor-pointer"
+              className="text-2xl font-bold tracking-wider bg-gradient-to-r from-yellow-500 to-pink-400 text-transparent bg-clip-text cursor-pointer"
             >
               RespireX
             </Link>
@@ -46,7 +46,7 @@ const Navbar = () => {
                   duration={500}
                   spy={true}
                   activeClass="text-yellow-400"
-                  className="text-white hover:text-yellow-400 px-3 py-2 rounded-md text-sm font-medium relative group cursor-pointer transition-colors duration-300"
+                  className="text-zinc-950  hover:text-yellow-400 px-3 py-2 rounded-md text-sm font-extrabold relative group cursor-pointer transition-colors duration-300"
                 >
                   {item}
                   <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-yellow-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>

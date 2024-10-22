@@ -18,7 +18,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon: Ico
 );
 
 const Features: React.FC = () => (
-  <section id="features" className="min-h-screen flex items-center justify-center bg-black bg-opacity-90 py-12">
+  <section id="features" className="min-h-screen flex items-center justify-center bg-blue-200 bg-opacity-90 py-12">
     <div className="container mx-auto px-4">
       <h2 className="text-4xl font-bold text-white mb-12 text-center">Our Features</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
