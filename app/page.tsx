@@ -2,6 +2,9 @@ import React from 'react';
 import Navbar from './components/navbar';
 import HeroSection from './components/herosection';
 import About from './components/about';
+import Features from './components/features';
+import Solution from './components/Solution';
+import Footer from './components/Footer';
 
 // Placeholder components for Services and Contact
 const Services = () => (
@@ -27,17 +30,33 @@ export default function Home() {
     <div className="bg-gray-900 min-h-screen">
       <Navbar />
       <main className="snap-y snap-mandatory h-screen overflow-y-scroll">
-        <div className="snap-start">
+        <div  className="snap-start">
+            <section id='home'>
           <HeroSection />
+          </section>
         </div>
-        <div className="snap-start">
+        <div  className="snap-start">
+          <section id='about'>
           <About />
+          </section>
         </div>
-        <div className="snap-start">
-          <Services />
+        <div   className="snap-start">
+          <section id='Features'>
+          <Features/>
+          </section>
         </div>
-        <div className="snap-start">
+        <div id='Solution' className="snap-start">
+          <section id='Solution'>
+          <Solution/>
+          </section>
+        </div>
+        <div  className="snap-start">
+          <section id = 'contact' >
           <Contact />
+          </section>
+        </div>
+        <div className="snap-start">
+          <Footer/>
         </div>
       </main>
     </div>
