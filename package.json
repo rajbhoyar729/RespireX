@@ -9,25 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@next/swc-win32-x64-msvc": "^15.0.0",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.1",
-    "framer-motion": "^11.11.9",
-=======
     "@shadcn/ui": "^0.0.4",
->>>>>>> 649a36539211037adfc49b9ccdf613b34b7f3329
     "lucide-react": "^0.446.0",
     "next": "14.2.13",
     "react": "^18",
     "react-dom": "^18",
     "react-scroll": "^1.9.0",
-<<<<<<< HEAD
-    "yarn": "^1.22.22"
-=======
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7"
->>>>>>> 8be788a1ebb9a961a962488554c46f3df1b2c316
   },
   "devDependencies": {
     "@types/node": "^20",
