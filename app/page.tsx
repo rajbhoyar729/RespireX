@@ -6,15 +6,7 @@ import Features from './components/features';
 import Solution from './components/Solution';
 import Footer from './components/Footer';
 
-// Placeholder components for Services and Contact
-const Services = () => (
-  <section id="services" className="min-h-screen flex items-center justify-center bg-black bg-opacity-90">
-    <div className="text-center">
-      <h2 className="text-3xl font-bold text-white mb-4">Our Services</h2>
-      <p className="text-lg text-gray-300">Comprehensive respiratory disease detection and analysis.</p>
-    </div>
-  </section>
-);
+
 
 const Contact = () => (
   <section id="contact" className="min-h-screen flex items-center justify-center bg-black bg-opacity-90">
