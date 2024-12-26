@@ -1,56 +1,61 @@
-import React from 'react';
-import Navbar from './components/navbar';
-import HeroSection from './components/herosection';
-import About from './components/about';
-import Features from './components/features';
-import Solution from './components/Solution';
-import Footer from './components/Footer';
+'use client'
 
-
-
-const Contact = () => (
-  <section id="contact" className="min-h-screen flex items-center justify-center bg-black bg-opacity-90">
-    <div className="text-center">
-      <h2 className="text-3xl font-bold text-white mb-4">Contact Us</h2>
-      <p className="text-lg text-gray-300">Get in touch for more information about RespireX.</p>
-    </div>
-  </section>
-);
+import { useRef, useState, useEffect } from 'react'
+import { LocomotiveScrollProvider } from 'react-locomotive-scroll'
+import Navbar from '../components/Navbar'
+import HeroSection from '../components/HeroSection'
+import About from '../components/About'
+import Features from '../components/Features'
+import Solution from '../components/Solution'
+import Footer from '../components/Footer'
 
 export default function Home() {
+  const containerRef = useRef(null)
+  const [activeSection, setActiveSection] = useState('home')
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY
+      const sections = ['home', 'about', 'features', 'solution']
+
+      for (const section of sections) {
+        const element = document.getElementById(section)
+        if (element) {
+          const { offsetTop, offsetHeight } = element
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(section)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <div className="bg-gray-900 min-h-screen">
-      <Navbar />
-      <main className="snap-y snap-mandatory h-screen overflow-y-scroll">
-        <div  className="snap-start">
-            <section id='home'>
-          <HeroSection />
-          </section>
-        </div>
-        <div  className="snap-start">
-          <section id='about'>
-          <About />
-          </section>
-        </div>
-        <div   className="snap-start">
-          <section id='Features'>
-          <Features/>
-          </section>
-        </div>
-        <div id='Solution' className="snap-start">
-          <section id='Solution'>
-          <Solution/>
-          </section>
-        </div>
-        <div  className="snap-start">
-          <section id = 'contact' >
-          <Contact />
-          </section>
-        </div>
-        <div className="snap-start">
-          <Footer/>
-        </div>
-      </main>
-    </div>
-  );
+    <LocomotiveScrollProvider
+      options={{
+        smooth: true,
+        lerp: 0.05,
+        multiplier: 0.5,
+      }}
+      containerRef={containerRef}
+      watch={[]}
+    >
+      <div className="flex flex-col min-h-screen">
+        <Navbar activeSection={activeSection} />
+        <main data-scroll-container ref={containerRef} className="flex-grow">
+          <HeroSection isActive={activeSection === 'home'} />
+          <About isActive={activeSection === 'about'} />
+          <Features isActive={activeSection === 'features'} />
+          <Solution isActive={activeSection === 'solution'} />
+        </main>
+        <Footer />
+         {/* This empty div allows scrolling beyond the footer */}
+      </div>
+    </LocomotiveScrollProvider>
+  )
 }
+
