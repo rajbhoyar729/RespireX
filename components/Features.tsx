@@ -67,6 +67,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon: Ico
   );
 };
 
+import React from 'react';
+
 interface FeaturesProps {
   isActive: boolean;
 }
