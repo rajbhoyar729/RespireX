@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectToDatabase } from '../../../lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { hash } from 'bcryptjs'
 
 export async function POST(req: Request) {
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       updatedAt: new Date()
     })
 
-    return NextResponse.json({ message: 'User registered successfully', userId: userId }, { status: 201 })
+    return NextResponse.json({ message: 'User registered successfully', userId: userId.toString() }, { status: 201 })
   } catch (error) {
     console.error('Registration error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

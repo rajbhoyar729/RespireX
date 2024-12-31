@@ -41,7 +41,7 @@ const About: React.FC<AboutProps> = ({ isActive }) => {
   }, [isActive]);
 
   return (
-    <section ref={sectionRef} id="about" className="py-20">
+    <section ref={sectionRef} id="about" className={`py-20 ${isActive ? 'active' : ''}`}>
       <div className="container mx-auto px-4">
         <h2 ref={titleRef} className="text-4xl font-bold text-center mb-8 text-white">About RespireX</h2>
         <p ref={contentRef} className="text-lg text-gray-200 max-w-3xl mx-auto text-center">

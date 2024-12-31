@@ -67,6 +67,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon: Ico
   );
 };
 
+import React from 'react';
+
 interface FeaturesProps {
   isActive: boolean;
 }
@@ -98,7 +100,7 @@ const Features: React.FC<FeaturesProps> = ({ isActive }) => {
   }, [isActive]);
 
   return (
-    <section ref={sectionRef} id="features" className="py-20">
+    <section ref={sectionRef} id="features" className={`py-20 ${isActive ? 'active' : ''}`}>
       <div className="container mx-auto px-4">
         <h2 ref={titleRef} className="text-4xl font-bold text-center mb-12 text-white">Our Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

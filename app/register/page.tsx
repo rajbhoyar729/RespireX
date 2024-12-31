@@ -15,7 +15,7 @@ export default function Register() {
   const router = useRouter()
   const { toast } = useToast()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
 
@@ -66,7 +66,11 @@ export default function Register() {
                 id="username"
                 type="text"
                 value={username}
+<<<<<<< HEAD
                 onChange={(e) => setUsername(e.target.value)}
+=======
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+>>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
                 required
               />
             </div>
@@ -76,7 +80,11 @@ export default function Register() {
                 id="password"
                 type="password"
                 value={password}
+<<<<<<< HEAD
                 onChange={(e) => setPassword(e.target.value)}
+=======
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+>>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
                 required
               />
             </div>

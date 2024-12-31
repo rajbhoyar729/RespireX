@@ -33,6 +33,7 @@ export default async function Home() {
       }
     }
 
+    const currentContainerRef = containerRef.current;
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])

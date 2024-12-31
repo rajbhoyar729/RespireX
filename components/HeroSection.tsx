@@ -45,7 +45,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isActive }) => {
     <section 
       ref={sectionRef} 
       id="home" 
-      className="relative min-h-screen flex items-center justify-center text-white overflow-hidden"
+      className={`relative min-h-screen flex items-center justify-center text-white overflow-hidden ${isActive ? 'active' : ''}`}
     >
       
       <div className="text-center max-w-4xl px-4 relative z-10">
