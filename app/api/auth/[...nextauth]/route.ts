@@ -1,10 +1,12 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { connectToDatabase } from "../../../../lib/mongodb"
+import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
+import clientPromise, { connectToDatabase } from "@/lib/mongodb"
 import { compare } from "bcryptjs"
 import { NextAuthOptions } from "next-auth"
 
 export const authOptions: NextAuthOptions = {
+  adapter: MongoDBAdapter(clientPromise) as any,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -24,7 +26,7 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const isPasswordCorrect = await compare(credentials.password, user.password)
+        const isPasswordCorrect = await compare(credentials.password, user.password as string)
 
         if (!isPasswordCorrect) {
           return null
@@ -33,10 +35,14 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user._id.toString(),
           username: user.username,
+          email: user.email || null,
         }
       }
     })
   ],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -56,9 +62,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
   },
-  session: {
-    strategy: "jwt",
-  },
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 const handler = NextAuth(authOptions)

@@ -98,7 +98,7 @@ const Solution: React.FC<SolutionProps> = ({ isActive }) => {
   }, [isActive]);
 
   return (
-    <section ref={sectionRef} id="solution" className="py-20">
+    <section ref={sectionRef} id="solution" className={`py-20 ${isActive ? 'active' : ''}`}>
       <div className="container mx-auto px-4">
         <h2 ref={titleRef} className="text-4xl font-bold text-center mb-12 text-white">Our Solutions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

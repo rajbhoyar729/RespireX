@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} text-white  min-h-screen`}>
+      <body className={`${poppins.className} text-white bg-black min-h-screen`}>
         <Background3D /> 
         <div className="relative z-10">
           {children}

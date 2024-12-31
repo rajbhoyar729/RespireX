@@ -26,7 +26,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
                 <Link
                   key={item.id}
                   href={`#${item.id}`}
-                  className="nav-item px-3 py-2 rounded-md text-sm font-medium relative transition-colors duration-300 text-white hover:text-yellow-400"
+                  className={`nav-item px-3 py-2 rounded-md text-sm font-medium relative transition-colors duration-300 text-white hover:text-yellow-400 ${activeSection === item.id ? 'text-yellow-400' : ''}`}
                 >
                   {item.name}
                 </Link>

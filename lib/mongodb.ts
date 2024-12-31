@@ -1,76 +1,45 @@
-import { MongoClient, MongoClientOptions, Db, WithId, Document } from 'mongodb';
-import { ObjectId } from 'mongodb';
-
-declare global {
-  // Extend the NodeJS.Global type to include _mongoClientPromise
-  namespace NodeJS {
-    interface Global {
-      _mongoClientPromise?: Promise<MongoClient>;
-    }
-  }
-
-  // Augment the globalThis type
-  let _mongoClientPromise: Promise<MongoClient> | undefined;
-}
+import { MongoClient, MongoClientOptions } from 'mongodb'
 
 if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your Mongo URI to .env.local');
+  throw new Error('Please add your Mongo URI to .env.local')
 }
 
-const uri = process.env.MONGODB_URI;
-const options: MongoClientOptions = {};
+const uri = process.env.MONGODB_URI
+const options: MongoClientOptions = {}
 
-let clientPromise: Promise<MongoClient>;
+let client: MongoClient
+let clientPromise: Promise<MongoClient>
 
 if (process.env.NODE_ENV === 'development') {
-  // Use a global variable for the development environment to prevent reinitialization
-  if (!(global as any)._mongoClientPromise) {
-    const client = new MongoClient(uri, options);
-    (global as any)._mongoClientPromise = client.connect();
+  // In development mode, use a global variable so that the value
+  // is preserved across module reloads caused by HMR (Hot Module Replacement).
+  let globalWithMongo = global as typeof globalThis & {
+    _mongoClientPromise?: Promise<MongoClient>
   }
-  clientPromise = (global as any)._mongoClientPromise!;
+
+  if (!globalWithMongo._mongoClientPromise) {
+    client = new MongoClient(uri, options)
+    globalWithMongo._mongoClientPromise = client.connect()
+  }
+  clientPromise = globalWithMongo._mongoClientPromise
 } else {
-  // In production, create a new client for each connection
-  const client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+  // In production mode, it's best to not use a global variable.
+  client = new MongoClient(uri, options)
+  clientPromise = client.connect()
 }
 
-let db: Db;
+// Export a module-scoped MongoClient promise. By doing this in a
+// separate module, the client can be shared across functions.
+export default clientPromise
 
-export async function connectToDatabase(): Promise<void> {
+export async function connectToDatabase() {
   try {
-    const client = await clientPromise; // Await the promise to get the MongoClient instance
-    db = client.db();
+    const client = await clientPromise
+    const db = client.db()
+    return { client, db }
   } catch (error) {
-    console.error('Failed to connect to the database:', error);
-    throw new Error('Unable to connect to the database');
+    console.error('Failed to connect to the database', error)
+    throw new Error('Unable to connect to the database')
   }
 }
 
-// Interface for the predictions array
-interface Prediction {
-  features: Record<string, unknown>;
-  prediction: unknown;
-  timestamp: Date;
-}
-
-// Interface for the user_health document
-interface UserHealth {
-  _id?: ObjectId;
-  userId: string;
-  predictions: Prediction[];
-  latestPrediction: unknown;
-  updatedAt: Date;
-}
-
-export const getUserHealth = async (userId: string): Promise<UserHealth | null> => {
-  if (!db) {
-    throw new Error('Database connection not initialized. Call connectToDatabase() first.');
-  }
-
-  const userHealth: WithId<Document> | null = await db.collection('health').findOne({ userId });
-  if (!userHealth) {
-    return null;
-  }
-  return userHealth as UserHealth;
-};
