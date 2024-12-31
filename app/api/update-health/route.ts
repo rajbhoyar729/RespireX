@@ -1,65 +1,83 @@
-import { NextResponse } from 'next/server';
-import { connectToDatabase } from '../../../lib/mongodb';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]/route';
-import { ObjectId } from 'mongodb';
-
-// Define the Prediction interface
-interface Prediction {
-  features: any;
-  prediction: any;
-  timestamp: Date;
-}
-
-// Define the UserHealth interface
-interface UserHealth {
-  _id?: ObjectId;
-  userId: string;
-  predictions: Prediction[];
-  latestPrediction: any;
-  updatedAt: Date;
-}
+import { NextResponse } from 'next/server'
+import { connectToDatabase } from '../../../lib/mongodb'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../auth/[...nextauth]/route"
+import { ObjectId } from 'mongodb'
+import { predictionSchema } from '@/lib/types'
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Authenticate user
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { features, prediction } = await req.json();
-    const { db } = await connectToDatabase();
+    // Validate request body
+    const body = await req.json()
+    const validatedData = predictionSchema.safeParse(body)
 
-    const userId = session.user.id;
+    if (!validatedData.success) {
+      console.error('Validation error:', validatedData.error)
+      return NextResponse.json(
+        { error: 'Invalid request data' },
+        { status: 400 }
+      )
+    }
 
-    // Explicitly type the collection
-    const userHealthCollection = db.collection<UserHealth>('user_health');
+    const { features, prediction } = validatedData.data
 
-    // Update operation
-    const result = await userHealthCollection.updateOne(
+    // Connect to database
+    const { db } = await connectToDatabase()
+    const userId = new ObjectId(session.user.id)
+
+    // Update health record
+    const result = await db.collection('user_health').updateOne(
       { userId },
       {
         $push: {
           predictions: {
-            features,
-            prediction,
-            timestamp: new Date(),
-          },
+            $each: [
+              {
+                features: features,
+                prediction: prediction,
+                timestamp: new Date(),
+              },
+            ],
+          } as any, // Add 'as any' to bypass type checking
         },
         $set: {
           latestPrediction: prediction,
-          updatedAt: new Date(),
-        },
-      } as Partial<UserHealth> // Cast to Partial<UserHealth> for type compatibility
-    );
+          updatedAt: new Date()
+        }
+      },
+      { upsert: true } // Create document if it doesn't exist
+    )
 
-    if (result.matchedCount === 0) {
-      return NextResponse.json({ error: 'User health record not found' }, { status: 404 });
+    if (result.matchedCount === 0 && result.upsertedCount === 0) {
+      console.error('Failed to update health record:', {
+        userId: session.user.id,
+        matchedCount: result.matchedCount,
+        modifiedCount: result.modifiedCount,
+        upsertedCount: result.upsertedCount
+      })
+      return NextResponse.json(
+        { error: 'Failed to update health record' },
+        { status: 500 }
+      )
     }
 
-    return NextResponse.json({ message: 'Health data updated successfully' });
+    return NextResponse.json({
+      message: 'Health data updated successfully',
+      updated: result.modifiedCount > 0,
+      created: result.upsertedCount > 0
+    })
   } catch (error) {
-    console.error('Health data update error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Health data update error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }
+

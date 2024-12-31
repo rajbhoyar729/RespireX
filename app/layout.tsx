@@ -1,8 +1,9 @@
-'use client'
-
 import { Poppins } from 'next/font/google'
 import './globals.css'
 import Background3D from '../components/Background3D'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import { SessionProvider } from "next-auth/react"
 
 const poppins = Poppins({ 
   weight: ['300', '400', '500', '600', '700'],
@@ -16,13 +17,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={`${poppins.className} text-white  min-h-screen`}>
-        <Background3D /> 
-        <div className="relative z-10">
-          {children}
-        </div>
-        
+    <html lang="en" className="scroll-smooth">
+      <body className={`${poppins.className} text-white bg-black min-h-screen`}>
+        <SessionProvider>
+          <Background3D />
+          <div className="relative z-10">
+            <Navbar />
+            {children}
+            <Footer />
+          </div>
+        </SessionProvider>
       </body>
     </html>
   )
