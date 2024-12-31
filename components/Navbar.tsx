@@ -1,4 +1,9 @@
+import React from 'react';
 import Link from 'next/link';
+
+interface NavbarProps {
+  activeSection: string;
+}
 
 const navItems = [
   { name: 'Home', id: 'home' },
@@ -7,7 +12,7 @@ const navItems = [
   { name: 'Solution', id: 'solution' },
 ];
 
-const Navbar = () => {
+const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
   return (
     <nav className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-transparent px-4 md:px-8 py-4">
       <div className="max-w-7xl mx-auto">
