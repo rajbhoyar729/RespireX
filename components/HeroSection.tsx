@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import Link from 'next/link';
+import * as React from "react"
 
 interface HeroSectionProps {
   isActive: boolean;

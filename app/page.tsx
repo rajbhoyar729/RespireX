@@ -8,8 +8,11 @@ import About from '../components/About'
 import Features from '../components/Features'
 import Solution from '../components/Solution'
 import Footer from '../components/Footer'
+import { auth } from "@/auth"
 
-export default function Home() {
+
+export default async function Home() {
+  const session = await auth()
   const containerRef = useRef(null)
   const [activeSection, setActiveSection] = useState('home')
 
@@ -53,8 +56,7 @@ export default function Home() {
           <Features isActive={activeSection === 'features'} />
           <Solution isActive={activeSection === 'solution'} />
         </main>
-        <Footer />
-         {/* This empty div allows scrolling beyond the footer */}
+        <div className="h-screen bg-transparent"></div>
       </div>
     </LocomotiveScrollProvider>
   )

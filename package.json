@@ -9,7 +9,37 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@google/generative-ai": "^0.21.0",
+=======
+<<<<<<< HEAD
+    "@auth/mongodb-adapter": "^3.7.4",
+    "@google/generative-ai": "^0.21.0",
+    "@radix-ui/react-scroll-area": "^1.2.2",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-toast": "^1.2.4",
+    "@react-three/drei": "^9.120.4",
+    "@react-three/fiber": "^8.17.10",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
+    "gsap": "^3.12.5",
+    "locomotive-scroll": "^4.1.4",
+    "lucide-react": "^0.469.0",
+    "mongodb": "^6.12.0",
+    "next": "^15.1.2",
+    "next-auth": "^5.0.0-beta.25",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-locomotive-scroll": "^0.2.2",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.171.0",
+    "zod": "^3.24.1"
+=======
+>>>>>>> b812a8111f804c809b39017d6df9ea22ea08be24
     "@next-auth/mongodb-adapter": "^1.1.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/locomotive-scroll": "^4.1.4",
@@ -38,6 +68,7 @@
     "three": "^0.153.0",
     "typescript": "5.1.3",
     "zod": "^3.21.4"
+>>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

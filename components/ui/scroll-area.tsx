@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+import { ScrollArea as RadixScrollArea } from "@radix-ui/react-scroll-area"
+=======
+>>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
 import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 
@@ -35,7 +39,11 @@ const ScrollBar = React.forwardRef<
       orientation === "horizontal" &&
         "h-2.5 border-t border-t-transparent p-[1px]",
       className
+<<<<<<< HEAD
+    )} 
+=======
     )}
+>>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
     {...props}
   >
     <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />

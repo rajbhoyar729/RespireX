@@ -2,10 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export default function Background3D() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -106,7 +102,6 @@ export default function Background3D() {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('resize', updateSize)
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
       containerRef.current?.removeChild(renderer.domElement)
     }
   }, [])
@@ -122,4 +117,3 @@ export default function Background3D() {
     />
   )
 }
-
