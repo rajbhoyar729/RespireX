@@ -1,16 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
 
-interface NavbarProps {
-  activeSection: string;
-}
-
 const navItems = [
   { name: 'Home', id: 'home' },
   { name: 'About', id: 'about' },
   { name: 'Features', id: 'features' },
   { name: 'Solution', id: 'solution' },
 ];
+
+interface NavbarProps {
+  activeSection: string;
+}
 
 const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
   return (

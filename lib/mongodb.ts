@@ -10,7 +10,7 @@ declare global {
   }
 
   // Augment the globalThis type
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
+  let _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
 if (!process.env.MONGODB_URI) {
@@ -24,11 +24,11 @@ let clientPromise: Promise<MongoClient>;
 
 if (process.env.NODE_ENV === 'development') {
   // Use a global variable for the development environment to prevent reinitialization
-  if (!global._mongoClientPromise) {
+  if (!(global as any)._mongoClientPromise) {
     const client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+    (global as any)._mongoClientPromise = client.connect();
   }
-  clientPromise = global._mongoClientPromise!;
+  clientPromise = (global as any)._mongoClientPromise!;
 } else {
   // In production, create a new client for each connection
   const client = new MongoClient(uri, options);
@@ -49,8 +49,8 @@ export async function connectToDatabase(): Promise<void> {
 
 // Interface for the predictions array
 interface Prediction {
-  features: any;
-  prediction: any;
+  features: Record<string, unknown>;
+  prediction: unknown;
   timestamp: Date;
 }
 
@@ -59,7 +59,7 @@ interface UserHealth {
   _id?: ObjectId;
   userId: string;
   predictions: Prediction[];
-  latestPrediction: any;
+  latestPrediction: unknown;
   updatedAt: Date;
 }
 
