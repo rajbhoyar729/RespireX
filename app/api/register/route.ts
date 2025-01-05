@@ -1,5 +1,3 @@
-import 'server-only'
-export const runtime = 'nodejs'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import { hash } from 'bcryptjs'
