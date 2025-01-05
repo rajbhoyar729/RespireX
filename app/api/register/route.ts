@@ -1,6 +1,11 @@
+import 'server-only'
+export const runtime = 'nodejs'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import { hash } from 'bcryptjs'
+import { MongoClient } from 'mongodb';
+
+const clientPromise = new MongoClient(process.env.MONGODB_URI!).connect();
 
 export async function POST(req: Request) {
   try {

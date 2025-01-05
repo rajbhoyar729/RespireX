@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 'use client'
 
-=======
-import React from 'react';
->>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useCallback } from 'react';
@@ -16,7 +12,6 @@ const navItems = [
   { name: 'Solution', href: '/#solution' },
 ];
 
-<<<<<<< HEAD
 const Navbar = () => {
   const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,13 +22,6 @@ const Navbar = () => {
     await signOut();
   }, []);
 
-=======
-interface NavbarProps {
-  activeSection: string;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
->>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
   return (
     <nav className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-transparent px-4 md:px-8 py-4">
       <div className="max-w-7xl mx-auto">
@@ -45,15 +33,9 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => (
                 <Link
-<<<<<<< HEAD
                   key={item.href}
                   href={item.href}
                   className="nav-item px-3 py-2 rounded-md text-sm font-medium relative transition-colors duration-300 text-white hover:text-yellow-400"
-=======
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className={`nav-item px-3 py-2 rounded-md text-sm font-medium relative transition-colors duration-300 text-white hover:text-yellow-400 ${activeSection === item.id ? 'text-yellow-400' : ''}`}
->>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
                 >
                   {item.name}
                 </Link>
