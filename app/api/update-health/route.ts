@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
 import { getServerSession } from "next-auth/next"
@@ -9,26 +8,6 @@ import { predictionSchema } from '@/lib/types'
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
-=======
-import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
-import { auth } from "@/auth";
-import { ObjectId } from 'mongodb';
-import { predictionSchema } from '@/lib/types';
-import type { Session } from 'next-auth'; // Import Session type
-
-interface AuthSession {
-  user?: {
-    id: string;
-    [key: string]: any;
-  };
-}
-
-export async function POST(req: Request) {
-  try {
-    const session = await auth() as AuthSession | null;
-    
->>>>>>> b76671f26bbb15937a9192bd28c7b8ea3a1a9241
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -48,16 +27,10 @@ export async function POST(req: Request) {
     // Extract validated data
     const { features, prediction } = validatedData.data;
 
-<<<<<<< HEAD
     // Connect to database
     const client = await clientPromise;
     const db = client.db()
     const userId = new ObjectId(session.user.id)
-=======
-    // Connect to the database
-    const { db } = await connectToDatabase();
-    const userId = new ObjectId(session.user.id);
->>>>>>> b76671f26bbb15937a9192bd28c7b8ea3a1a9241
 
     // Define the update document
     const updateDoc = {
@@ -106,10 +79,6 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
-<<<<<<< HEAD
     )
-=======
-    );
->>>>>>> b76671f26bbb15937a9192bd28c7b8ea3a1a9241
   }
 }

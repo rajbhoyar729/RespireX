@@ -12,15 +12,11 @@ const navItems = [
   { name: 'Solution', href: '/#solution' },
 ];
 
-<<<<<<< HEAD
 interface NavbarProps {
   activeSection: string;
 }
 
 export default function Navbar({ activeSection }: NavbarProps) {
-=======
-const Navbar = () => {
->>>>>>> b76671f26bbb15937a9192bd28c7b8ea3a1a9241
   const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
