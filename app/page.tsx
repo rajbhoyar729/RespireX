@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, RefObject } from 'react'
 import { LocomotiveScrollProvider } from 'react-locomotive-scroll'
 import Navbar from '../components/Navbar'
 import HeroSection from '../components/HeroSection'
@@ -10,10 +10,12 @@ import Solution from '../components/Solution'
 import Footer from '../components/Footer'
 import { auth } from "@/auth"
 
+interface NavbarProps {
+  activeSection: string
+}
 
-export default async function Home() {
-  const session = await auth()
-  const containerRef = useRef(null)
+export default function Home() {
+  const containerRef = useRef<HTMLElement>(null) // Explicitly type as RefObject<HTMLElement>
   const [activeSection, setActiveSection] = useState('home')
 
   useEffect(() => {
@@ -33,7 +35,6 @@ export default async function Home() {
       }
     }
 
-    const currentContainerRef = containerRef.current;
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -45,7 +46,7 @@ export default async function Home() {
         lerp: 0.05,
         multiplier: 0.5,
       }}
-      containerRef={containerRef}
+      containerRef={containerRef as RefObject<HTMLElement>} // Type assertion
       watch={[]}
     >
       <div className="flex flex-col min-h-screen">
@@ -61,4 +62,3 @@ export default async function Home() {
     </LocomotiveScrollProvider>
   )
 }
-

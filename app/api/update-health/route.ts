@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-<<<<<<< HEAD
-import { connectToDatabase } from '../../../lib/mongodb'
+import clientPromise from '@/lib/mongodb'
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../auth/[...nextauth]/route"
 import { ObjectId } from 'mongodb'
@@ -8,7 +7,6 @@ import { predictionSchema } from '@/lib/types'
 
 export async function POST(req: Request) {
   try {
-    // Authenticate user
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -29,7 +27,8 @@ export async function POST(req: Request) {
     const { features, prediction } = validatedData.data
 
     // Connect to database
-    const { db } = await connectToDatabase()
+    const client = await clientPromise;
+    const db = client.db()
     const userId = new ObjectId(session.user.id)
 
     // Update health record
@@ -79,31 +78,6 @@ export async function POST(req: Request) {
       { error: 'Internal server error' },
       { status: 500 }
     )
-=======
-import { connectToDatabase } from '@/lib/mongodb'
-import { auth } from "@/auth"
-
-export async function GET(req: Request) {
-  try {
-    const session = await auth()
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { db } = await connectToDatabase()
-    const userId = session.user.id
-
-    const healthData = await db.collection('user_health').findOne({ userId })
-
-    if (!healthData) {
-      return NextResponse.json({ error: 'Health data not found' }, { status: 404 })
-    }
-
-    return NextResponse.json(healthData)
-  } catch (error) {
-    console.error('Error fetching health data:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
->>>>>>> ecca23994d572172023c991bd71e3d3eada81f0c
   }
 }
 

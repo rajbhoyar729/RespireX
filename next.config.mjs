@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["localhost:3000"],
+    },
+  },
   images: {
     domains: ['placeholder.svg'],
   },
@@ -19,9 +23,14 @@ const nextConfig = {
       },
     ]
   },
+  webpack: (config, { isServer }) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      punycode: false,
+    };
+    return config;
+  },
 }
-
-
 
 export default nextConfig;
 
