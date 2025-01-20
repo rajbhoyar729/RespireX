@@ -4,9 +4,8 @@ import bcrypt from 'bcryptjs';
 import clientPromise from '@/lib/mongodb';
 import { Session } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
-import { Awaitable } from 'next-auth';
 
-export const authOptions = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -43,25 +42,13 @@ export const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async session({ 
-      session, 
-      token 
-    }: { 
-      session: Session; 
-      token: JWT & { id?: string } 
-    }): Promise<Session> {
+    async session({ session, token }: { session: Session; token: JWT & { id?: string } }) {
       if (token.id) {
         session.user.id = token.id;
       }
       return session;
     },
-    async redirect({ 
-      url, 
-      baseUrl 
-    }: { 
-      url: string; 
-      baseUrl: string 
-    }): Promise<string> {
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
       return '/dashboard';
     },
   },
@@ -73,4 +60,5 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };
