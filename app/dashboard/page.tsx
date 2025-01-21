@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,114 +16,137 @@ export default function Dashboard() {
   const [userData, setUserData] = useState<any>(null);
   const [healthData, setHealthData] = useState<any>(null);
   const [hasMedicalHistory, setHasMedicalHistory] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { data: session, status } = useSession();
   const { toast } = useToast();
 
+  // Fetch user data
   const fetchUserData = useCallback(async () => {
     try {
+      if (!session?.user?.email) {
+        throw new Error('User email not found in session');
+      }
+
       const response = await fetch('/api/user');
-      if (response.ok) {
-        const data = await response.json();
-        setUserData(data);
-      } else {
+      if (!response.ok) {
         throw new Error('Failed to fetch user data');
       }
+
+      const user = await response.json();
+      setUserData(user);
+      setHealthData(user.diseaseDetections || []);
+      setHasMedicalHistory(user.diseaseDetections?.length > 0);
     } catch (error) {
       console.error('Error fetching user data:', error);
+      setError('Failed to fetch user data. Please try again.');
       toast({
         title: 'Error',
         description: 'Failed to fetch user data. Please try again.',
         variant: 'destructive',
       });
+    } finally {
+      setIsLoading(false);
     }
-  }, [toast]);
+  }, [session, toast]);
 
-  const fetchHealthData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/health');
-      if (response.ok) {
-        const data = await response.json();
-        setHealthData(data);
-        // Check if the user has medical history
-        setHasMedicalHistory(data.predictions && data.predictions.length > 0);
-      } else {
-        throw new Error('Failed to fetch health data');
-      }
-    } catch (error) {
-      console.error('Error fetching health data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch health data. Please try again.',
-        variant: 'destructive',
+  // Update session info on component mount
+  useEffect(() => {
+    if (status === 'authenticated' && session.user?.email) {
+      fetch('/api/update-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: session.user.email }),
+      }).catch((error) => {
+        console.error('Error updating session info:', error);
       });
     }
-  }, [toast]);
+  }, [status, session]);
 
+  // Redirect to login if unauthenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
     } else if (status === 'authenticated') {
       fetchUserData();
-      fetchHealthData();
     }
-  }, [status, router, fetchUserData, fetchHealthData]);
+  }, [status, router, fetchUserData]);
 
+  // Handle file input change
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFile(e.target.files[0]);
     }
   }, []);
 
+  // Handle form submission for audio analysis
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!file) return;
+      if (!file || !session?.user?.email) return;
 
       setIsAnalyzing(true);
-      const formData = new FormData();
-      formData.append('audio', file);
+      setError(null);
 
       try {
-        // Extract features
+        // Step 1: Extract features from the audio file
+        const formData = new FormData();
+        formData.append('audio', file);
+
         const featuresResponse = await fetch('/api/extract-features', {
           method: 'POST',
           body: formData,
         });
+
         if (!featuresResponse.ok) {
           throw new Error('Failed to extract features');
         }
+
         const featuresData = await featuresResponse.json();
 
-        // Predict disease
+        // Step 2: Predict disease using the extracted features
         const predictionResponse = await fetch('/api/predict', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(featuresData),
         });
+
         if (!predictionResponse.ok) {
           throw new Error('Failed to predict disease');
         }
+
         const predictionData = await predictionResponse.json();
         setPrediction(predictionData.prediction);
 
-        // Update user health data in MongoDB
+        // Step 3: Update user health data in MongoDB
         const updateResponse = await fetch('/api/update-health', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ features: featuresData, prediction: predictionData.prediction }),
+          body: JSON.stringify({
+            email: session.user.email,
+            diseaseDetected: predictionData.prediction,
+            category: 'Respiratory', // Example category
+            timeOfDetection: new Date(),
+            date: new Date(),
+          }),
         });
+
         if (!updateResponse.ok) {
           throw new Error('Failed to update health data');
         }
 
-        fetchHealthData(); // Refresh health data after update
+        // Refresh health data
+        fetchUserData();
+
+        // Show success toast
         toast({
           title: 'Success',
           description: 'Analysis completed successfully.',
         });
       } catch (error) {
         console.error('Error during analysis:', error);
+        setError('An error occurred during analysis. Please try again.');
         toast({
           title: 'Error',
           description: 'An error occurred during analysis. Please try again.',
@@ -133,11 +156,21 @@ export default function Dashboard() {
         setIsAnalyzing(false);
       }
     },
-    [file, fetchHealthData, toast]
+    [file, session, fetchUserData, toast]
   );
 
-  if (status === 'loading' || !userData || !healthData) {
+  // Loading state
+  if (status === 'loading' || isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
   }
 
   return (
@@ -151,15 +184,15 @@ export default function Dashboard() {
             <CardTitle>Medical History</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Latest Prediction: {healthData.latestPrediction || 'No prediction yet'}</p>
-            <p>Total Predictions: {healthData.predictions.length}</p>
+            <p>Latest Prediction: {healthData[healthData.length - 1]?.diseaseDetected || 'No prediction yet'}</p>
+            <p>Total Predictions: {healthData.length}</p>
             <div className="mt-4">
               <h3 className="text-lg font-semibold">Previous Predictions:</h3>
               <ul className="list-disc pl-6">
-                {healthData.predictions.map((prediction: any, index: number) => (
+                {healthData.map((detection: any, index: number) => (
                   <li key={index} className="mt-2">
-                    <p><strong>Prediction:</strong> {prediction.prediction}</p>
-                    <p><strong>Date:</strong> {new Date(prediction.timestamp).toLocaleDateString()}</p>
+                    <p><strong>Prediction:</strong> {detection.diseaseDetected}</p>
+                    <p><strong>Date:</strong> {new Date(detection.date).toLocaleDateString()}</p>
                   </li>
                 ))}
               </ul>

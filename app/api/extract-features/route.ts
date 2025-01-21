@@ -1,22 +1,30 @@
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { addAudioData } from '@/lib/model';
 
 export async function POST(req: Request) {
   try {
-    const formData = await req.formData()
-    const audio = formData.get('audio') as File
-
-    // This is a placeholder implementation. In a real-world scenario,
-    // you would process the audio file and extract actual features.
-    const features = {
-      mfcc: [1, 2, 3, 4, 5],
-      spectral_centroid: 1000,
-      zero_crossing_rate: 0.1,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json(features)
+    const formData = await req.formData();
+    const audioFile = formData.get('audio') as File;
+
+    // Add audio data to the user's record
+    await addAudioData(session.user.email, {
+      audioFile: audioFile.name,
+      timestamp: new Date(),
+    });
+
+    return NextResponse.json({ message: 'Audio data added successfully' });
   } catch (error) {
-    console.error('Feature extraction error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Error adding audio data:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
-
