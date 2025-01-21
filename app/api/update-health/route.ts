@@ -1,13 +1,26 @@
-import { NextResponse } from 'next/server'
-import clientPromise from '@/lib/mongodb'
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../auth/[...nextauth]/route"
-import { ObjectId } from 'mongodb'
-import { predictionSchema } from '@/lib/types'
+import { NextResponse } from 'next/server';
+import clientPromise from '@/lib/mongodb';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route'; // Ensure this is exported
+import { ObjectId } from 'mongodb';
+import { predictionSchema } from '@/lib/types';
+
+interface HealthData {
+  userId: ObjectId;
+  predictions: {
+    features: Record<string, number>;
+    prediction: string;
+    timestamp: Date;
+  }[];
+  latestPrediction: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    // Validate session
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -19,7 +32,7 @@ export async function POST(req: Request) {
     if (!validatedData.success) {
       console.error('Validation error:', validatedData.error);
       return NextResponse.json(
-        { error: 'Invalid request data' },
+        { error: 'Invalid request data', details: validatedData.error.errors },
         { status: 400 }
       );
     }
@@ -29,8 +42,8 @@ export async function POST(req: Request) {
 
     // Connect to database
     const client = await clientPromise;
-    const db = client.db()
-    const userId = new ObjectId(session.user.id)
+    const db = client.db(); // Replace with your database name if needed
+    const userId = new ObjectId(session.user.id);
 
     // Define the update document
     const updateDoc = {
@@ -40,7 +53,7 @@ export async function POST(req: Request) {
           prediction,
           timestamp: new Date(),
         },
-      } as any,
+      },
       $set: {
         latestPrediction: prediction,
         updatedAt: new Date(),
@@ -48,7 +61,7 @@ export async function POST(req: Request) {
     };
 
     // Update the user's health record
-    const result = await db.collection('user_health').updateOne(
+    const result = await db.collection<HealthData>('user_health').updateOne(
       { userId },
       updateDoc,
       { upsert: true }
@@ -77,8 +90,8 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Health data update error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'An internal server error occurred. Please try again later.' },
       { status: 500 }
-    )
+    );
   }
 }

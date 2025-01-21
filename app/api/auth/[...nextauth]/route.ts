@@ -5,7 +5,8 @@ import clientPromise from '@/lib/mongodb';
 import { Session } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 
-const authOptions = {
+// Define authOptions
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -59,6 +60,6 @@ const authOptions = {
   },
 };
 
+// Export the handler
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
