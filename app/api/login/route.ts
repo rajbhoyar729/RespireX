@@ -1,23 +1,33 @@
 import { NextResponse } from 'next/server';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth/next';
 import bcrypt from 'bcryptjs';
-import { findUserByEmail, updateSessionInfo } from '@/lib/model';
+import { getUserCollection } from '@/lib/model';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { email, password } = body;
 
-    // Find the user by email
-    const user = await findUserByEmail(email);
-    if (!user) {
+    if (!email || !password) {
       return NextResponse.json(
-        { message: 'User not found' },
+        { message: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    // Compare the password
+    const usersCollection = await getUserCollection();
+    const user = await usersCollection.findOne({ 'loginInfo.email': email });
+
+    if (!user) {
+      return NextResponse.json(
+        { message: 'User not found' },
+        { status: 404 }
+      );
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.loginInfo.password);
+
     if (!isValidPassword) {
       return NextResponse.json(
         { message: 'Invalid password' },
@@ -25,13 +35,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update session info
-    await updateSessionInfo(email);
-
-    return NextResponse.json(
-      { message: 'Login successful', user: user.profile },
-      { status: 200 }
+    // Update session info (e.g., login count and last login)
+    await usersCollection.updateOne(
+      { 'loginInfo.email': email },
+      {
+        $set: { 'sessionInfo.lastLogin': new Date() },
+        $inc: { 'sessionInfo.loginCount': 1 },
+      }
     );
+
+    // Create a session using NextAuth.js
+    const session = await getServerSession(authOptions);
+    if (session) {
+      return NextResponse.json(
+        {
+          message: 'Login successful',
+          user: {
+            id: user.profile.userId,
+            name: user.profile.username,
+            email: user.profile.email,
+          },
+        },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { message: 'Failed to create session' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(

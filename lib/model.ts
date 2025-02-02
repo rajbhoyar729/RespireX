@@ -1,34 +1,38 @@
 import { Db, Collection } from 'mongodb';
 import clientPromise from './mongodb';
 import { User, userSchema } from './schema';
+import { AudioData, audioDataSchema } from './schema';
+import { DiseaseDetection, diseaseDetectionSchema } from './schema';
+import { ChatHistory, chatHistorySchema } from './schema';
 
 // Helper function to get the database instance
 const getDb = async (): Promise<Db> => {
   const client = await clientPromise;
-  return client.db('your_database_name'); // Replace with your database name
+  return client.db('RespireX'); // Replace with your database name
 };
 
-// User Model
+// User Collection
 export const getUserCollection = async (): Promise<Collection<User>> => {
   const db = await getDb();
-  return db.collection<User>('users');
+  return db.collection<User>('User');
 };
 
-// Ensure a category exists in the user document
-const ensureCategoryExists = async (email: string, category: keyof User) => {
-  const usersCollection = await getUserCollection();
-  const user = await usersCollection.findOne({ 'loginInfo.email': email });
+// AudioData Collection
+export const getAudioDataCollection = async (): Promise<Collection<AudioData>> => {
+  const db = await getDb();
+  return db.collection<AudioData>('AudioData');
+};
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+// DiseaseDetection Collection
+export const getDiseaseDetectionCollection = async (): Promise<Collection<DiseaseDetection>> => {
+  const db = await getDb();
+  return db.collection<DiseaseDetection>('DiseaseDetection');
+};
 
-  if (!user[category]) {
-    await usersCollection.updateOne(
-      { 'loginInfo.email': email },
-      { $set: { [category]: {} } }
-    );
-  }
+// ChatHistory Collection
+export const getChatHistoryCollection = async (): Promise<Collection<ChatHistory>> => {
+  const db = await getDb();
+  return db.collection<ChatHistory>('ChatHistory');
 };
 
 // Find a user by email
@@ -37,7 +41,7 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
   return usersCollection.findOne({ 'loginInfo.email': email });
 };
 
-// Create a new user with profile and login info
+// Create a new user
 export const createUser = async (userData: {
   profile: { username: string; userId: string; email: string };
   loginInfo: { userId: string; email: string; password: string };
@@ -55,47 +59,21 @@ export const createUser = async (userData: {
   });
 };
 
-// Update user profile
-export const updateUserProfile = async (
-  email: string,
-  profile: { username: string; userId: string; email: string }
-): Promise<void> => {
-  const usersCollection = await getUserCollection();
-  await usersCollection.updateOne(
-    { 'loginInfo.email': email },
-    { $set: { profile } }
-  );
-};
-
-// Update login info
-export const updateLoginInfo = async (
-  email: string,
-  loginInfo: { userId: string; email: string; password: string }
-): Promise<void> => {
-  const usersCollection = await getUserCollection();
-  await usersCollection.updateOne(
-    { 'loginInfo.email': email },
-    { $set: { loginInfo } }
-  );
-};
-
-// Add audio data to a user's record
+// Add audio data to the AudioData collection
 export const addAudioData = async (
-  email: string,
+  userId: string,
   audioData: { audioFile: string; timestamp: Date }
 ): Promise<void> => {
-  const usersCollection = await getUserCollection();
-  await ensureCategoryExists(email, 'audioData');
-
-  await usersCollection.updateOne(
-    { 'loginInfo.email': email },
-    { $push: { audioData: audioData } }
-  );
+  const audioDataCollection = await getAudioDataCollection();
+  await audioDataCollection.insertOne({
+    userId,
+    ...audioData,
+  });
 };
 
-// Add disease detection data to a user's record
+// Add disease detection data to the DiseaseDetection collection
 export const addDiseaseDetection = async (
-  email: string,
+  userId: string,
   detectionData: {
     diseaseDetected: string;
     category: string;
@@ -103,20 +81,31 @@ export const addDiseaseDetection = async (
     date: Date;
   }
 ): Promise<void> => {
-  const usersCollection = await getUserCollection();
-  await ensureCategoryExists(email, 'diseaseDetections');
+  const diseaseDetectionCollection = await getDiseaseDetectionCollection();
+  await diseaseDetectionCollection.insertOne({
+    userId,
+    ...detectionData,
+  });
+};
 
-  await usersCollection.updateOne(
-    { 'loginInfo.email': email },
-    { $push: { diseaseDetections: detectionData } }
-  );
+// Add chat history data to the ChatHistory collection
+export const addChatHistory = async (
+  userId: string,
+  chatData: {
+    disease: string;
+    messages: { sender: 'user' | 'ai'; message: string; timestamp: Date }[];
+  }
+): Promise<void> => {
+  const chatHistoryCollection = await getChatHistoryCollection();
+  await chatHistoryCollection.insertOne({
+    userId,
+    ...chatData,
+  });
 };
 
 // Update session info (e.g., login count and last login)
 export const updateSessionInfo = async (email: string): Promise<void> => {
   const usersCollection = await getUserCollection();
-  await ensureCategoryExists(email, 'sessionInfo');
-
   await usersCollection.updateOne(
     { 'loginInfo.email': email },
     {
@@ -124,4 +113,22 @@ export const updateSessionInfo = async (email: string): Promise<void> => {
       $inc: { 'sessionInfo.loginCount': 1 },
     }
   );
+};
+
+// Get all audio data for a user
+export const getAudioDataByUserId = async (userId: string): Promise<AudioData[]> => {
+  const audioDataCollection = await getAudioDataCollection();
+  return audioDataCollection.find({ userId }).toArray();
+};
+
+// Get all disease detections for a user
+export const getDiseaseDetectionsByUserId = async (userId: string): Promise<DiseaseDetection[]> => {
+  const diseaseDetectionCollection = await getDiseaseDetectionCollection();
+  return diseaseDetectionCollection.find({ userId }).toArray();
+};
+
+// Get all chat history for a user
+export const getChatHistoryByUserId = async (userId: string): Promise<ChatHistory[]> => {
+  const chatHistoryCollection = await getChatHistoryCollection();
+  return chatHistoryCollection.find({ userId }).toArray();
 };

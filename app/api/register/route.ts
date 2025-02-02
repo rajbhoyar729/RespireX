@@ -1,19 +1,36 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { createUser } from '@/lib/model';
+import { getUserCollection, createUser } from '@/lib/model';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { name, email, password } = body;
 
-    // Generate a unique user ID
-    const userId = `user_${Date.now()}`;
+    if (!name || !email || !password) {
+      return NextResponse.json(
+        { message: 'Name, email, and password are required' },
+        { status: 400 }
+      );
+    }
+
+    const usersCollection = await getUserCollection();
+    const existingUser = await usersCollection.findOne({ 'loginInfo.email': email });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { message: 'User already exists' },
+        { status: 409 }
+      );
+    }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the user with required data structure
+    // Generate a unique user ID
+    const userId = `user_${Date.now()}`;
+
+    // Create the user
     await createUser({
       profile: {
         username: name,

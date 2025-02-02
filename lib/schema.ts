@@ -14,24 +14,48 @@ const loginInfoSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-// Audio Data Schema
-const audioDataSchema = z.object({
+// Session Info Schema
+const sessionInfoSchema = z.object({
+  userId: z.string(),
+  loginCount: z.number(), // Number of times the user has logged in
+  lastLogin: z.date(),
+});
+
+// User Schema (now only contains essential user info)
+export const userSchema = z.object({
+  profile: profileSchema,
+  loginInfo: loginInfoSchema,
+  sessionInfo: sessionInfoSchema,
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+
+export type User = z.infer<typeof userSchema>;
+
+// Audio Data Schema (separate collection)
+export const audioDataSchema = z.object({
+  userId: z.string(), // Reference to the user
   audioFile: z.string(), // Store the file path or URL
   timestamp: z.date(),
 });
 
-// Disease Detection Schema
-const diseaseDetectionSchema = z.object({
+export type AudioData = z.infer<typeof audioDataSchema>;
+
+// Disease Detection Schema (separate collection)
+export const diseaseDetectionSchema = z.object({
+  userId: z.string(), // Reference to the user
   diseaseDetected: z.string(),
   category: z.string(),
   timeOfDetection: z.date(),
   date: z.date(),
 });
 
-// Chat History Schema
-const chatHistorySchema = z.object({
+export type DiseaseDetection = z.infer<typeof diseaseDetectionSchema>;
+
+// Chat History Schema (separate collection)
+export const chatHistorySchema = z.object({
+  userId: z.string(), // Reference to the user
   disease: z.string(),
-  userId: z.string(),
   messages: z.array(
     z.object({
       sender: z.enum(['user', 'ai']),
@@ -41,23 +65,4 @@ const chatHistorySchema = z.object({
   ),
 });
 
-// Session Info Schema
-const sessionInfoSchema = z.object({
-  userId: z.string(),
-  loginCount: z.number(), // Number of times the user has logged in
-  lastLogin: z.date(),
-});
-
-// User Schema
-export const userSchema = z.object({
-  profile: profileSchema,
-  loginInfo: loginInfoSchema,
-  audioData: z.array(audioDataSchema).optional(),
-  diseaseDetections: z.array(diseaseDetectionSchema).optional(),
-  chatHistory: z.array(chatHistorySchema).optional(),
-  sessionInfo: sessionInfoSchema,
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
-});
-
-export type User = z.infer<typeof userSchema>;
+export type ChatHistory = z.infer<typeof chatHistorySchema>;

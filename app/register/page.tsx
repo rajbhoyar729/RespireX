@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -95,16 +94,18 @@ export default function Register() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">
       {/* Add margin to the top and bottom of the Card */}
-      <div className="mt-8 mb-8">
-        <Card>
+      <div className="mt-12 mb-12">
+        <Card className="shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">Register for RespireX</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center text-primary dark:text-white">
+              Register for RespireX
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name Field */}
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Name
                 </label>
                 <Input
@@ -113,15 +114,18 @@ export default function Register() {
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
+                  placeholder="Enter your full name"
                   required
-                  className={errors.name ? 'border-red-500' : ''}
+                  className={`mt-1 block w-full ${
+                    errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
+                  }`}
                 />
                 {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
               </div>
 
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email
                 </label>
                 <Input
@@ -130,15 +134,18 @@ export default function Register() {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
+                  placeholder="Enter your email address"
                   required
-                  className={errors.email ? 'border-red-500' : ''}
+                  className={`mt-1 block w-full ${
+                    errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
+                  }`}
                 />
                 {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
               </div>
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Password
                 </label>
                 <Input
@@ -147,27 +154,34 @@ export default function Register() {
                   type="password"
                   value={formData.password}
                   onChange={handleChange}
+                  placeholder="Enter a strong password"
                   required
-                  className={errors.password ? 'border-red-500' : ''}
+                  className={`mt-1 block w-full ${
+                    errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
+                  }`}
                 />
                 {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
               </div>
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300"
+                disabled={isLoading}
+              >
                 {isLoading ? 'Registering...' : 'Register'}
               </Button>
-            </form>
 
-            {/* Login Link */}
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{' '}
-                <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-                  Log in
-                </Link>
-              </p>
-            </div>
+              {/* Login Link */}
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Already have an account?{' '}
+                  <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+                    Log in
+                  </Link>
+                </p>
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>

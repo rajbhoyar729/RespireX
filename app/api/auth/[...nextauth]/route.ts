@@ -1,12 +1,19 @@
-import NextAuth from 'next-auth';
+import { NextAuthOptions, Session } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import clientPromise from '@/lib/mongodb';
-import { Session } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
+import NextAuth from 'next-auth'; // Import NextAuth
 
-// Define authOptions
-export const authOptions = {
+// Extend Session type
+interface ExtendedSession extends Session {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -20,39 +27,43 @@ export const authOptions = {
         }
 
         const client = await clientPromise;
-        const db = client.db('your_database_name');
-        const user = await db.collection('users').findOne({ email: credentials.email });
+        const db = client.db('RespireX');
+        const user = await db.collection('User').findOne({ 'loginInfo.email': credentials.email });
 
         if (!user) {
           throw new Error('User not found');
         }
 
-        const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+        const isValidPassword = await bcrypt.compare(credentials.password, user.loginInfo.password);
 
         if (!isValidPassword) {
           throw new Error('Invalid password');
         }
 
         return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
+          id: user.profile.userId,
+          name: user.profile.username,
+          email: user.profile.email,
         };
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async session({ session, token }: { session: Session; token: JWT & { id?: string } }) {
+    async session({ session, token }): Promise<ExtendedSession> {
+      const extendedSession = session as ExtendedSession;
       if (token.id) {
-        session.user.id = token.id;
+        extendedSession.user.id = token.id as string;
       }
-      return session;
+      return extendedSession;
     },
-    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
-      return '/dashboard';
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET, // Ensure this is set
   pages: {
     signIn: '/login',
     signOut: '/logout',
@@ -60,6 +71,5 @@ export const authOptions = {
   },
 };
 
-// Export the handler
-const handler = NextAuth(authOptions);
+const handler = NextAuth(authOptions); // Use NextAuth
 export { handler as GET, handler as POST };

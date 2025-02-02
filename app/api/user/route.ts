@@ -14,10 +14,10 @@ export async function GET() {
     const user = await usersCollection.findOne({ 'loginInfo.email': session.user.email });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'User not found', exists: false }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json({ ...user, exists: true });
   } catch (error) {
     console.error('Error fetching user data:', error);
     return NextResponse.json(
