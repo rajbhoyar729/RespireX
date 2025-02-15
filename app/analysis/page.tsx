@@ -83,7 +83,7 @@ export default function AnalysisPage() {
   };
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col min-h ">
       {/* Navbar */}
       <Navbar activeSection="analysis" />
 

@@ -25,10 +25,10 @@ export const predictionSchema = z.object({
 })
 
 export const chatMessageSchema = z.object({
-  message: z.string().min(1).max(1000)
+  message: z.string().min(1).max(1000),
+  userId: z.string().min(1) // Added required userId field
 })
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type PredictionInput = z.infer<typeof predictionSchema>
-export type ChatMessageInput = z.infer<typeof chatMessageSchema>
-
+export type ChatMessageInput = z.infer<typeof chatMessageSchema> // Now includes userId
