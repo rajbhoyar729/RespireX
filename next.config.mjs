@@ -3,11 +3,17 @@ const nextConfig = {
   reactStrictMode: true, // Enables React's strict mode for better error handling and warnings.
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000"], // Restricts server actions to specific origins.
+      allowedOrigins: ["localhost:3000", "*.vercel.app"], // Restricts server actions to specific origins.
     },
   },
   images: {
     domains: ['placeholder.svg'], // Specifies allowed image domains for Next.js Image Optimization.
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   async headers() {
     return [
@@ -17,6 +23,14 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'no-store', // Disables caching for all routes.
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
         ],
       },

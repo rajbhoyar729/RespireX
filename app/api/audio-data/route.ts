@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
+import authOptions from '@/lib/authOptions';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]/route';
 import { getAudioDataCollection, addAudioData } from '@/lib/model';
 
 // Get all audio data for the logged-in user

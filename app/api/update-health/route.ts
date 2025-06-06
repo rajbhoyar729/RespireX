@@ -1,16 +1,14 @@
 // File: app/api/update-health/route.ts
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import authOptions from '@/lib/authOptions';
 import {
   addDiseaseDetection,
   getDiseaseDetectionsByUserId,
 } from '@/lib/model';
 
-/**
- * Function to update disease detection data in the database.
- */
-export async function updateDiseaseDetection(
+// Helper function to update disease detection data in the database.
+async function updateDiseaseDetection(
   email: string,
   diseaseDetected: string,
   category: string,
@@ -31,11 +29,8 @@ export async function updateDiseaseDetection(
   }
 }
 
-/**
- * Function to fetch the last detected disease for a user.
- * Returns a single object if found, or null if no detection exists.
- */
-export async function getDetectedDisease(email: string) {
+// Helper function to fetch the last detected disease for a user.
+async function getDetectedDisease(email: string) {
   try {
     const detections = await getDiseaseDetectionsByUserId(email);
     if (!detections || detections.length === 0) {
@@ -56,9 +51,7 @@ export async function getDetectedDisease(email: string) {
   }
 }
 
-/**
- * POST endpoint to handle health data operations.
- */
+// POST endpoint to handle health data operations.
 export async function POST(req: Request) {
   try {
     // Authenticate the user session

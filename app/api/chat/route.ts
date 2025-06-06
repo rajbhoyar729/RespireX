@@ -4,7 +4,7 @@ import { chatMessageSchema } from '@/lib/types';
 import { headers } from 'next/headers';
 import { getDiseaseDetectionsByUserId } from '@/lib/model';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import authOptions from '@/lib/authOptions';
 
 if (!process.env.GEMINI_API_KEY) {
   throw new Error('GEMINI_API_KEY is not set');

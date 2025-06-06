@@ -5,9 +5,8 @@ import { Readable } from 'stream';
 import { Buffer } from 'buffer';
 import type { IncomingMessage } from 'http';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { findUserByEmail } from '@/lib/model';
-import { updateDiseaseDetection } from '@/app/api/update-health/route'; // Import update function
+import authOptions from '@/lib/authOptions';
+import { findUserByEmail, addDiseaseDetection } from '@/lib/model';
 
 // Define interfaces
 interface FormidableResult {
@@ -19,12 +18,7 @@ interface FormidableResult {
 type AudioFile = formidable.File;
 
 // Force the Node.js runtime
-export const config = {
-  runtime: 'nodejs',
-  api: {
-    bodyParser: false,
-  },
-};
+export const runtime = "nodejs";
 
 // Map of filenames to their corresponding disease names
 const fileNameDiseaseMap: Map<string, string> = new Map([
@@ -76,6 +70,28 @@ const parseForm = async (req: Request): Promise<FormidableResult> => {
     });
   });
 };
+
+// Helper function to update disease detection data in the database.
+async function updateDiseaseDetection(
+  email: string,
+  diseaseDetected: string,
+  category: string,
+  timeOfDetection: Date,
+  date: Date
+) {
+  try {
+    await addDiseaseDetection(email, {
+      diseaseDetected,
+      category,
+      timeOfDetection,
+      date,
+    });
+    return { success: true, message: 'Health data updated successfully' };
+  } catch (error) {
+    console.error('Error updating disease detection data:', error);
+    throw new Error('Failed to update disease detection data');
+  }
+}
 
 export async function POST(req: Request) {
   try {

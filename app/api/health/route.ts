@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import authOptions from '@/lib/authOptions';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]/route';
 import { ObjectId } from 'mongodb';
+import { getUserCollection } from '@/lib/model';
 
 interface HealthData {
   userId: ObjectId;
