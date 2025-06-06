@@ -39,7 +39,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="nav-item px-3 py-2 rounded-md text-sm font-medium relative transition-colors duration-300 text-white hover:text-yellow-400"
+                  className={`nav-item px-3 py-2 rounded-md text-sm font-medium relative transition-colors duration-300 ${activeSection === item.href.replace('/#', '') || (item.href === '/' && activeSection === 'home') ? 'text-yellow-400' : 'text-white'} hover:text-yellow-400`}
                 >
                   {item.name}
                 </Link>
@@ -79,7 +79,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-yellow-400"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${activeSection === item.href.replace('/#', '') || (item.href === '/' && activeSection === 'home') ? 'text-yellow-400' : 'text-white'} hover:text-yellow-400`}
                 onClick={toggleMenu}
               >
                 {item.name}

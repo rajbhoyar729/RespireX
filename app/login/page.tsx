@@ -24,20 +24,31 @@ export default function Login() {
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: false, // Prevent automatic redirection
+        redirect: false,
       });
 
       if (result?.error) {
-        throw new Error(result.error);
+        toast({
+          title: 'Error',
+          description: result.error,
+          variant: 'destructive',
+        });
+        return;
       }
 
-      // Redirect to dashboard on successful login
-      router.push('/dashboard');
+      if (result?.ok) {
+        toast({
+          title: 'Success',
+          description: 'Login successful!',
+        });
+        router.push('/dashboard');
+        router.refresh();
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'An error occurred during login',
+        description: 'An error occurred during login',
         variant: 'destructive',
       });
     } finally {
@@ -47,68 +58,69 @@ export default function Login() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">
-      {/* Card Container */}
-      <Card className="shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center text-primary dark:text-white">
-            Log in to RespireX
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-                className="mt-1 block w-full"
-              />
-            </div>
+      <div className="mt-12 mb-12">
+        <Card className="shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center text-primary dark:text-white">
+              Log in to RespireX
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  className="mt-1 block w-full"
+                />
+              </div>
 
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-                className="mt-1 block w-full"
-              />
-            </div>
+              {/* Password Field */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  className="mt-1 block w-full"
+                />
+              </div>
 
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Logging in...' : 'Log in'}
-            </Button>
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Logging in...' : 'Log in'}
+              </Button>
 
-            {/* Register Link */}
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Don't have an account?{' '}
-                <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-                  Register
-                </Link>
-              </p>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              {/* Register Link */}
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Don't have an account?{' '}
+                  <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+                    Register
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

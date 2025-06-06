@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import Link from 'next/link';
+import useScrollAnimation from '../hooks/useScrollAnimation';
 import * as React from "react"
 
 interface HeroSectionProps {
@@ -10,36 +11,18 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ isActive }) => {
-  const sectionRef = useRef(null);
-  const headingRef = useRef(null);
-  const subheadingRef = useRef(null);
-  const ctaRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const subheadingRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const heading = headingRef.current;
-    const subheading = subheadingRef.current;
-    const cta = ctaRef.current;
-
-    gsap.set([heading, subheading, cta], { autoAlpha: 0, y: 50 });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top center",
-        end: "bottom center",
-        toggleActions: "play none none reverse",
-      },
-    });
-
-    tl.to(heading, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out" })
-      .to(subheading, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.4")
-      .to(cta, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.4");
-
-    return () => {
-      tl.kill();
-    };
-  }, []);
+  useScrollAnimation({
+    sectionRef,
+    animatedRefs: [headingRef, subheadingRef, ctaRef],
+    start: "top center",
+    end: "bottom center",
+    stagger: 0.2,
+  });
 
   return (
     <section 

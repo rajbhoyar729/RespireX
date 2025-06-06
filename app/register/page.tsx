@@ -52,6 +52,8 @@ export default function Register() {
         body: JSON.stringify(validatedData),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         // Registration successful
         toast({
@@ -61,7 +63,6 @@ export default function Register() {
         router.push('/login');
       } else {
         // Handle backend errors
-        const data = await response.json();
         toast({
           title: 'Error',
           description: data.message || 'Registration failed',

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as React from "react"
+import useScrollAnimation from '../hooks/useScrollAnimation';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,29 +17,13 @@ const About: React.FC<AboutProps> = ({ isActive }) => {
   const titleRef = useRef(null);
   const contentRef = useRef(null);
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const title = titleRef.current;
-    const content = contentRef.current;
-
-    gsap.set([title, content], { autoAlpha: 0, y: 50 });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top center",
-        end: "center center",
-        toggleActions: "play none none reverse",
-      },
-    });
-
-    tl.to(title, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out" })
-      .to(content, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.4");
-
-    return () => {
-      tl.kill();
-    };
-  }, [isActive]);
+  useScrollAnimation({
+    sectionRef,
+    animatedRefs: [titleRef, contentRef],
+    start: "top center",
+    end: "center center",
+    stagger: 0.1,
+  });
 
   return (
     <section ref={sectionRef} id="about" className={`py-20 ${isActive ? 'active' : ''}`}>
