@@ -64,10 +64,14 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
+    // Log specific error details in production
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Login error details:', error.message, error.stack);
+    }
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Internal server error', error: error.message },
       { status: 500 }
     );
   }

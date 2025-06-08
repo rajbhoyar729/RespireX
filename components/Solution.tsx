@@ -4,7 +4,7 @@ import { useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShieldCheck, ClipboardList, Info, ShieldAlert } from 'lucide-react';
-import useScrollAnimation from '../hooks/useScrollAnimation';
+import { useLanding } from '@/contexts/LandingContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -49,23 +49,18 @@ const SolutionCard: React.FC<SolutionCardProps> = ({ title, description, icon: I
 	);
 };
 
-interface SolutionProps {
-	isActive: boolean;
-}
-
-const Solution: React.FC<SolutionProps> = ({ isActive }) => {
+const Solution = () => {
 	const sectionRef = useRef<HTMLDivElement>(null);
 	const titleRef = useRef<HTMLHeadingElement>(null);
 	const cardsContainerRef = useRef<HTMLDivElement>(null);
+	const { activeSection, registerSection } = useLanding();
 	const memoizedSolutions = useMemo(() => solutions, []);
 
-	useScrollAnimation({
-		sectionRef,
-		animatedRefs: [titleRef],
-		start: 'top 80%',
-		end: 'bottom 20%',
-		stagger: 0.2,
-	});
+	useEffect(() => {
+		if (sectionRef.current) {
+			registerSection('solution', sectionRef);
+		}
+	}, [registerSection]);
 
 	useEffect(() => {
 		const section = sectionRef.current;
@@ -188,7 +183,7 @@ const Solution: React.FC<SolutionProps> = ({ isActive }) => {
 		<section 
 			ref={sectionRef} 
 			id="solution" 
-			className={`pt-32 pb-12 relative overflow-hidden ${isActive ? 'active' : ''}`}
+			className={`pt-32 pb-12 relative overflow-hidden ${activeSection === 'solution' ? 'active' : ''}`}
 			data-scroll
 			data-scroll-speed="0.5"
 			data-scroll-delay="0.1"

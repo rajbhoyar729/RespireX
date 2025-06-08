@@ -4,8 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Activity, Thermometer, Brain, AlertCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import useScrollAnimation from '../hooks/useScrollAnimation';
-import React from 'react';
+import { useLanding } from '@/contexts/LandingContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -50,22 +49,17 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon: Ico
 	);
 };
 
-interface FeaturesProps {
-	isActive: boolean;
-}
-
-const Features: React.FC<FeaturesProps> = ({ isActive }) => {
+const Features = () => {
 	const sectionRef = useRef<HTMLDivElement>(null);
 	const titleRef = useRef<HTMLHeadingElement>(null);
 	const cardsContainerRef = useRef<HTMLDivElement>(null);
+	const { activeSection, registerSection } = useLanding();
 
-	useScrollAnimation({
-		sectionRef,
-		animatedRefs: [titleRef],
-		start: 'top 75%',
-		end: 'bottom 25%',
-		stagger: 0.3,
-	});
+	useEffect(() => {
+		if (sectionRef.current) {
+			registerSection('features', sectionRef);
+		}
+	}, [registerSection]);
 
 	useEffect(() => {
 		const section = sectionRef.current;
@@ -186,7 +180,7 @@ const Features: React.FC<FeaturesProps> = ({ isActive }) => {
 		<section 
 			ref={sectionRef} 
 			id="features" 
-			className={`py-32 relative overflow-hidden ${isActive ? 'active' : ''}`}
+			className={`py-32 relative overflow-hidden ${activeSection === 'features' ? 'active' : ''}`}
 			data-scroll
 			data-scroll-speed="0.5"
 			data-scroll-delay="0.1"

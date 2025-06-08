@@ -48,10 +48,14 @@ export async function POST(request: Request) {
       { message: 'User registered successfully' },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Registration error:', error);
+    // Log specific error details in production
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Registration error details:', error.message, error.stack);
+    }
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Internal server error', error: error.message },
       { status: 500 }
     );
   }
