@@ -16,25 +16,30 @@ const authOptions: NextAuthOptions = {
           throw new Error('Email and password are required');
         }
 
-        const client = await clientPromise;
-        const db = client.db('RespireX');
-        const user = await db.collection('User').findOne({ 'loginInfo.email': credentials.email });
+        try {
+          const client = await clientPromise;
+          const db = client.db('RespireX');
+          const user = await db.collection('User').findOne({ 'loginInfo.email': credentials.email });
 
-        if (!user) {
-          throw new Error('User not found');
+          if (!user) {
+            throw new Error('User not found');
+          }
+
+          const isValidPassword = await bcrypt.compare(credentials.password, user.loginInfo.password);
+
+          if (!isValidPassword) {
+            throw new Error('Invalid password');
+          }
+
+          return {
+            id: user.profile.userId,
+            name: user.profile.username,
+            email: user.profile.email,
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          throw error;
         }
-
-        const isValidPassword = await bcrypt.compare(credentials.password, user.loginInfo.password);
-
-        if (!isValidPassword) {
-          throw new Error('Invalid password');
-        }
-
-        return {
-          id: user.profile.userId,
-          name: user.profile.username,
-          email: user.profile.email,
-        };
       },
     }),
   ],
@@ -58,6 +63,11 @@ const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
 };
 
 export default authOptions; 

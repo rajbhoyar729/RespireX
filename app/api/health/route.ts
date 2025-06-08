@@ -5,6 +5,12 @@ import { getServerSession } from 'next-auth/next';
 import { ObjectId } from 'mongodb';
 import { getUserCollection } from '@/lib/model';
 
+// Route configuration
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
+
 interface HealthData {
   userId: ObjectId;
   predictions: any[]; // Replace `any` with a more specific type if possible
