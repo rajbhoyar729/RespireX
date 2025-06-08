@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <LandingProvider>
       <div className="flex flex-col min-h-screen">
-        <Navbar />
+        <Navbar activeSection="home" />
         <LocomotiveScrollProvider
           options={{
             smooth: true,
