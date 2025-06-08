@@ -65,119 +65,50 @@ const Solution = () => {
 
 	useEffect(() => {
 		const section = sectionRef.current;
-		const cardsContainer = cardsContainerRef.current;
 		const title = titleRef.current;
 		const subtitle = subtitleRef.current;
+		const cards = gsap.utils.toArray(cardsContainerRef.current?.children || []); // Ensure cards is always an array
 
-		if (!section || !cardsContainer || !title || !subtitle) return;
+		if (!section || !title || !subtitle || cards.length === 0) return;
 
-		// Set initial state for title and subtitle with higher z-index
-		gsap.set([title, subtitle], {
-			autoAlpha: 0,
-			y: 50,
-			zIndex: 50
+		// Initial state for all elements to be hidden
+		gsap.set([title, subtitle], { autoAlpha: 0, y: 50, zIndex: 50 });
+		gsap.set(cards, { autoAlpha: 0, y: 100 });
+
+		// Animation for title and subtitle
+		ScrollTrigger.create({
+			trigger: section,
+			start: 'top bottom',
+			end: 'bottom top',
+			scrub: 1, 
+			markers: true, // Added markers for debugging
+			animation: gsap.fromTo([title, subtitle], 
+				{ autoAlpha: 0, y: 50 }, 
+				{ autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out' }
+			),
 		});
 
-		// Animate title and subtitle with higher z-index
-		gsap.to([title, subtitle], {
-			autoAlpha: 1,
-			y: 0,
-			duration: 1,
-			ease: 'power3.out',
-			scrollTrigger: {
-				trigger: section,
-				start: 'top 80%',
-				end: 'top 60%',
-				scrub: 0.5,
-				markers: false,
-			}
-		});
-
-		const cards = gsap.utils.toArray(cardsContainer.children);
-
-		// Initial state with better positioning
-		gsap.set(cards, { 
-			autoAlpha: 0, 
-			y: 100,
-			scale: 0.9,
-			rotation: 5
-		});
-
-		const tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: section,
-				start: 'top 80%',
-				end: 'bottom 20%',
-				scrub: 0.5,
-				markers: false,
-				anticipatePin: 1,
-				fastScrollEnd: true,
-				preventOverlaps: true,
-				onEnter: () => {
-					gsap.to(cards, {
-						autoAlpha: 1,
-						y: 0,
-						scale: 1,
-						rotation: 0,
-						ease: 'power3.out',
-						duration: 1.2,
-						stagger: {
-							amount: 0.8,
-							from: 'start',
-							ease: 'power2.inOut'
-						},
-					});
-				},
-				onLeaveBack: () => {
-					gsap.to(cards, {
-						autoAlpha: 0,
-						y: -50,
-						scale: 0.9,
-						rotation: -5,
-						ease: 'power3.in',
-						duration: 1,
-						stagger: {
-							amount: 0.5,
-							from: 'end',
-							ease: 'power2.inOut'
-						},
-					});
-				},
-				onUpdate: (self) => {
-					// Smoother parallax effect
-					cards.forEach((card: any, index) => {
-						const speed = 1 + (index * 0.15);
-						gsap.to(card, {
-							y: self.progress * 30 * speed,
-							rotation: self.progress * 1.5 * speed,
-							duration: 0.1,
-							ease: 'power1.out'
-						});
-					});
-				}
-			},
+		// Animation for solution cards
+		ScrollTrigger.create({
+			trigger: section,
+			start: 'top bottom-=100', // Start slightly after section enters
+			end: 'bottom top+=100', // End slightly after section leaves
+			scrub: 1, 
+			markers: true, // Added markers for debugging
+			animation: gsap.fromTo(cards, 
+				{ autoAlpha: 0, y: 100 }, 
+				{ autoAlpha: 1, y: 0, ease: 'power3.out', stagger: 0.2, delay: 0.3 }
+			),
 		});
 
 		return () => {
-			tl.kill();
 			ScrollTrigger.getAll().forEach(trigger => {
 				if (trigger.vars.trigger === section) {
 					trigger.kill();
 				}
 			});
-			// Reset all cards to initial state
-			gsap.set(cards, { 
-				autoAlpha: 1, 
-				y: 0,
-				scale: 1,
-				rotation: 0
-			});
-			// Reset title and subtitle state
-			gsap.set([title, subtitle], {
-				autoAlpha: 1,
-				y: 0,
-				zIndex: 50
-			});
+			// Reset elements to their original state to prevent flashes on re-render
+			gsap.set([title, subtitle, ...cards], { clearProps: 'all' });
 		};
 	}, []);
 
@@ -186,9 +117,6 @@ const Solution = () => {
 			ref={sectionRef} 
 			id="solution" 
 			className={`pt-32 pb-12 relative overflow-hidden ${activeSection === 'solution' ? 'active' : ''}`}
-			data-scroll
-			data-scroll-speed="0.5"
-			data-scroll-delay="0.1"
 		>
 			<div className="container mx-auto px-4">
 				<h2 

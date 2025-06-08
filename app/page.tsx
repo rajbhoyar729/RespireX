@@ -21,7 +21,8 @@ export default function Home() {
 
     let scroll: any;
 
-    if (containerRef.current) {
+    // Ensure LocomotiveScroll and ScrollTrigger are only initialized on the client-side
+    if (typeof window !== 'undefined' && containerRef.current) {
       scroll = new LocomotiveScroll({
         el: containerRef.current,
         smooth: true,
@@ -43,16 +44,23 @@ export default function Home() {
 
       // Refresh ScrollTrigger when Locomotive Scroll is ready
       ScrollTrigger.addEventListener('refresh', () => scroll.update());
-      ScrollTrigger.refresh();
+      
+      // Delay the initial refresh to ensure Locomotive Scroll has settled
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100); // Small delay, adjust if needed
     }
 
     return () => {
       if (scroll) {
         scroll.destroy();
       }
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      ScrollTrigger.removeEventListener('refresh', () => scroll.update());
-      ScrollTrigger.scrollerProxy(containerRef.current, undefined); // Clear the scroller proxy with undefined
+      // Only kill ScrollTriggers if in a browser environment
+      if (typeof window !== 'undefined') {
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        ScrollTrigger.removeEventListener('refresh', () => scroll.update());
+        ScrollTrigger.scrollerProxy(containerRef.current, undefined); // Clear the scroller proxy with undefined
+      }
     };
   }, []);
 

@@ -41,8 +41,6 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon: Ico
 	return (
 		<div 
 			className="bg-white/10 backdrop-blur-md p-6 rounded-lg shadow-lg text-center transition duration-300 hover:shadow-xl transform hover:scale-105"
-			data-scroll
-			data-scroll-speed="0.5"
 		>
 			<div className="flex justify-center items-center w-16 h-16 mb-4 rounded-full bg-blue-100 mx-auto">
 				<Icon className="w-8 h-8 text-blue-500" />
@@ -70,59 +68,48 @@ const Features = () => {
 		const section = sectionRef.current;
 		const title = titleRef.current;
 		const subtitle = subtitleRef.current;
-		const cards = cardsContainerRef.current?.children;
+		const cards = gsap.utils.toArray(cardsContainerRef.current?.children || []);
 
-		if (!section || !title || !subtitle || !cards) return;
+		if (!section || !title || !subtitle || cards.length === 0) return;
 
-		// Initial state
-		gsap.set([title, subtitle], { opacity: 0, y: 30 });
-		gsap.set(cards, { opacity: 0, y: 50 });
+		// Initial state for all elements to be hidden
+		gsap.set([title, subtitle], { opacity: 0, y: 50 });
+		gsap.set(cards, { opacity: 0, y: 100 });
 
-		// Create a timeline for the section
-		const tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: section,
-				start: 'top center',
-				end: 'bottom center',
-				scrub: 1,
-				markers: false,
-				onEnter: () => {
-					// Animate title and subtitle
-					gsap.to([title, subtitle], {
-						opacity: 1,
-						y: 0,
-						duration: 1,
-						ease: 'power2.out',
-					});
+		// Animation for title and subtitle
+		ScrollTrigger.create({
+			trigger: section,
+			start: 'top bottom',
+			end: 'bottom top',
+			scrub: 1,
+			markers: true,
+			animation: gsap.fromTo([title, subtitle], 
+				{ opacity: 0, y: 50 }, 
+				{ opacity: 1, y: 0, ease: 'power3.out' }
+			),
+		});
 
-					// Animate cards with stagger
-					gsap.to(cards, {
-						opacity: 1,
-						y: 0,
-						duration: 1,
-						stagger: 0.2,
-						ease: 'power2.out',
-						delay: 0.3,
-					});
-				},
-				onLeaveBack: () => {
-					gsap.to([title, subtitle, cards], {
-						opacity: 0,
-						y: 30,
-						duration: 0.5,
-						ease: 'power2.in',
-					});
-				},
-			},
+		// Animation for feature cards
+		ScrollTrigger.create({
+			trigger: section,
+			start: 'top bottom-=100',
+			end: 'bottom top+=100',
+			scrub: 1,
+			markers: true,
+			animation: gsap.fromTo(cards, 
+				{ opacity: 0, y: 100 }, 
+				{ opacity: 1, y: 0, ease: 'power3.out', stagger: 0.2, delay: 0.3 }
+			),
 		});
 
 		return () => {
-			tl.kill();
 			ScrollTrigger.getAll().forEach(trigger => {
 				if (trigger.vars.trigger === section) {
 					trigger.kill();
 				}
 			});
+			// Reset elements to their original state to prevent flashes on re-render
+			gsap.set([title, subtitle, ...cards], { clearProps: 'all' });
 		};
 	}, []);
 
@@ -131,8 +118,6 @@ const Features = () => {
 			ref={sectionRef} 
 			id="features" 
 			className={`py-32 relative overflow-hidden ${activeSection === 'features' ? 'active' : ''}`}
-			data-scroll
-			data-scroll-speed="0.5"
 		>
 			<div className="container mx-auto px-4">
 				<h2 
@@ -142,16 +127,12 @@ const Features = () => {
 						textShadow: '0 2px 4px rgba(0,0,0,0.3)',
 						WebkitTextStroke: '1px rgba(255,255,255,0.1)'
 					}}
-					data-scroll
-					data-scroll-speed="0.3"
 				>
 					Powerful Features Designed For You
 				</h2>
 				<p 
 					ref={subtitleRef} 
 					className="text-lg text-gray-300 text-center mb-20 max-w-3xl mx-auto relative z-20"
-					data-scroll
-					data-scroll-speed="0.4"
 				>
 					Discover how RespireX leverages cutting-edge technology to provide unparalleled respiratory health insights and proactive care.
 				</p>
