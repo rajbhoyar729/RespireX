@@ -6,6 +6,10 @@ import { Menu, X } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { useLanding } from '@/contexts/LandingContext';
 
+interface NavbarProps {
+  activeSection: string; // Changed from optional to required
+}
+
 const navItems = [
   { name: 'Home', href: '/#home' },
   { name: 'About', href: '/#about' },
@@ -13,10 +17,12 @@ const navItems = [
   { name: 'Solution', href: '/#solution' },
 ];
 
-export default function Navbar() {
+export default function Navbar({ activeSection: propActiveSection }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session, status } = useSession();
-  const { activeSection } = useLanding();
+  const { activeSection: contextActiveSection } = useLanding();
+
+  const activeSection = propActiveSection || contextActiveSection; // Prioritize prop over context
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

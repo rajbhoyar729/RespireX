@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
-import Navbar from '../../components/Navbar';
+import Navbar from '@/components/Navbar';
 import Footer from '../../components/Footer';
 
 // Configuration constants
