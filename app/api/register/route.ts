@@ -7,9 +7,30 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, password } = body;
 
+    // Input validation
     if (!name || !email || !password) {
+      console.error('Missing required fields:', { name: !!name, email: !!email, password: !!password });
       return NextResponse.json(
         { message: 'Name, email, and password are required' },
+        { status: 400 }
+      );
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      console.error('Invalid email format:', email);
+      return NextResponse.json(
+        { message: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    // Password strength validation
+    if (password.length < 6) {
+      console.error('Password too short');
+      return NextResponse.json(
+        { message: 'Password must be at least 6 characters long' },
         { status: 400 }
       );
     }
@@ -18,6 +39,7 @@ export async function POST(request: Request) {
     const existingUser = await usersCollection.findOne({ 'loginInfo.email': email });
 
     if (existingUser) {
+      console.error('User already exists:', email);
       return NextResponse.json(
         { message: 'User already exists' },
         { status: 409 }
@@ -44,6 +66,7 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log('User registered successfully:', email);
     return NextResponse.json(
       { message: 'User registered successfully' },
       { status: 201 }
@@ -52,10 +75,14 @@ export async function POST(request: Request) {
     console.error('Registration error:', error);
     // Log specific error details in production
     if (process.env.NODE_ENV === 'production') {
-      console.error('Registration error details:', error.message, error.stack);
+      console.error('Registration error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
     }
     return NextResponse.json(
-      { message: 'Internal server error', error: error.message },
+      { message: 'An error occurred during registration. Please try again.' },
       { status: 500 }
     );
   }

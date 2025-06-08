@@ -22,13 +22,15 @@ const authOptions: NextAuthOptions = {
           const user = await db.collection('User').findOne({ 'loginInfo.email': credentials.email });
 
           if (!user) {
-            throw new Error('User not found');
+            console.error('User not found:', credentials.email);
+            throw new Error('Invalid email or password');
           }
 
           const isValidPassword = await bcrypt.compare(credentials.password, user.loginInfo.password);
 
           if (!isValidPassword) {
-            throw new Error('Invalid password');
+            console.error('Invalid password for user:', credentials.email);
+            throw new Error('Invalid email or password');
           }
 
           return {
@@ -67,6 +69,17 @@ const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  events: {
+    async signIn({ user }) {
+      console.log('User signed in:', user.email);
+    },
+    async signOut({ token }) {
+      console.log('User signed out:', token.email);
+    },
   },
 };
 

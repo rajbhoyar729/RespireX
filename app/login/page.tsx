@@ -25,9 +25,11 @@ export default function Login() {
         email,
         password,
         redirect: false,
+        callbackUrl: '/dashboard',
       });
 
       if (result?.error) {
+        console.error('Login error:', result.error);
         toast({
           title: 'Error',
           description: result.error,
@@ -48,7 +50,7 @@ export default function Login() {
       console.error('Login error:', error);
       toast({
         title: 'Error',
-        description: 'An error occurred during login',
+        description: 'An unexpected error occurred. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -80,6 +82,7 @@ export default function Login() {
                   placeholder="Enter your email"
                   required
                   className="mt-1 block w-full"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -96,6 +99,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   required
                   className="mt-1 block w-full"
+                  disabled={isLoading}
                 />
               </div>
 
