@@ -62,12 +62,22 @@ export default function Register() {
         });
         router.push('/login');
       } else {
-        // Handle backend errors
-        toast({
-          title: 'Error',
-          description: data.message || 'Registration failed',
-          variant: 'destructive',
-        });
+        // Handle specific error cases
+        if (response.status === 409) {
+          toast({
+            title: 'Account Exists',
+            description: 'An account with this email already exists. Please log in instead.',
+            variant: 'destructive',
+          });
+          router.push('/login');
+        } else {
+          // Handle other backend errors
+          toast({
+            title: 'Error',
+            description: data.message || 'Registration failed. Please try again.',
+            variant: 'destructive',
+          });
+        }
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -83,7 +93,7 @@ export default function Register() {
         // Handle unexpected errors
         toast({
           title: 'Error',
-          description: 'An error occurred during registration',
+          description: 'An unexpected error occurred. Please try again.',
           variant: 'destructive',
         });
       }
@@ -117,6 +127,7 @@ export default function Register() {
                   onChange={handleChange}
                   placeholder="Enter your full name"
                   required
+                  disabled={isLoading}
                   className={`mt-1 block w-full ${
                     errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
                   }`}
@@ -137,6 +148,7 @@ export default function Register() {
                   onChange={handleChange}
                   placeholder="Enter your email address"
                   required
+                  disabled={isLoading}
                   className={`mt-1 block w-full ${
                     errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
                   }`}
@@ -157,6 +169,7 @@ export default function Register() {
                   onChange={handleChange}
                   placeholder="Enter a strong password"
                   required
+                  disabled={isLoading}
                   className={`mt-1 block w-full ${
                     errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
                   }`}

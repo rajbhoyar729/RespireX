@@ -3,30 +3,30 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShieldCheck, ClipboardList, Info, ShieldAlert } from 'lucide-react';
+import { ShieldCheck, ClipboardList, Info, ShieldAlert, HeartPulse, Stethoscope } from 'lucide-react';
 import { useLanding } from '@/contexts/LandingContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const solutions = [
 	{
-		title: 'Comprehensive Care Plans',
-		description: 'Personalized treatment strategies for optimal respiratory health.',
+		title: 'Holistic Care Plans',
+		description: 'Beyond monitoring, we offer comprehensive care plans tailored to your unique needs, guiding you towards sustained respiratory health and well-being.',
 		icon: ShieldCheck,
 	},
 	{
-		title: 'Telemedicine Integration',
-		description: 'Connect with healthcare providers remotely for continuous care.',
-		icon: ClipboardList,
+		title: 'Seamless Telemedicine Integration',
+		description: 'Easily connect with qualified healthcare professionals through our integrated telemedicine platform, ensuring convenient and continuous medical guidance from anywhere.',
+		icon: Stethoscope,
 	},
 	{
-		title: 'Health Education Resources',
-		description: 'Access to a wealth of information on respiratory health management.',
+		title: 'Empowering Health Education',
+		description: 'Gain access to a rich library of educational resources and expert articles, empowering you with the knowledge to actively manage and improve your respiratory health.',
 		icon: Info,
 	},
 	{
-		title: 'Emergency Response Protocol',
-		description: 'Quick action plans for sudden respiratory distress situations.',
+		title: 'Rapid Emergency Response',
+		description: 'In critical moments, our system provides a clear, actionable emergency response protocol, ensuring you and your loved ones are prepared for sudden respiratory distress situations.',
 		icon: ShieldAlert,
 	},
 ];
@@ -52,6 +52,7 @@ const SolutionCard: React.FC<SolutionCardProps> = ({ title, description, icon: I
 const Solution = () => {
 	const sectionRef = useRef<HTMLDivElement>(null);
 	const titleRef = useRef<HTMLHeadingElement>(null);
+	const subtitleRef = useRef<HTMLParagraphElement>(null);
 	const cardsContainerRef = useRef<HTMLDivElement>(null);
 	const { activeSection, registerSection } = useLanding();
 	const memoizedSolutions = useMemo(() => solutions, []);
@@ -66,18 +67,19 @@ const Solution = () => {
 		const section = sectionRef.current;
 		const cardsContainer = cardsContainerRef.current;
 		const title = titleRef.current;
+		const subtitle = subtitleRef.current;
 
-		if (!section || !cardsContainer || !title) return;
+		if (!section || !cardsContainer || !title || !subtitle) return;
 
-		// Set initial state for title with higher z-index
-		gsap.set(title, {
+		// Set initial state for title and subtitle with higher z-index
+		gsap.set([title, subtitle], {
 			autoAlpha: 0,
 			y: 50,
 			zIndex: 50
 		});
 
-		// Animate title with higher z-index
-		gsap.to(title, {
+		// Animate title and subtitle with higher z-index
+		gsap.to([title, subtitle], {
 			autoAlpha: 1,
 			y: 0,
 			duration: 1,
@@ -170,8 +172,8 @@ const Solution = () => {
 				scale: 1,
 				rotation: 0
 			});
-			// Reset title state
-			gsap.set(title, {
+			// Reset title and subtitle state
+			gsap.set([title, subtitle], {
 				autoAlpha: 1,
 				y: 0,
 				zIndex: 50
@@ -191,7 +193,7 @@ const Solution = () => {
 			<div className="container mx-auto px-4">
 				<h2 
 					ref={titleRef} 
-					className="text-4xl font-bold text-center mb-16 text-white relative z-50"
+					className="text-4xl font-bold text-center mb-4 text-white relative z-50"
 					style={{
 						textShadow: '0 2px 4px rgba(0,0,0,0.5)',
 						WebkitTextStroke: '1px rgba(255,255,255,0.2)',
@@ -199,14 +201,20 @@ const Solution = () => {
 						isolation: 'isolate'
 					}}
 				>
-					Our Solutions
+					Our Comprehensive Solutions
 				</h2>
+				<p 
+					ref={subtitleRef} 
+					className="text-lg text-gray-300 text-center mb-16 max-w-3xl mx-auto relative z-20"
+				>
+					RespireX offers a suite of integrated solutions designed to support your respiratory health journey from assessment to ongoing care and emergency preparedness.
+				</p>
 				<div 
 					ref={cardsContainerRef} 
-					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10"
+					className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10"
 				>
-					{memoizedSolutions.map((solution) => (
-						<SolutionCard key={solution.title} {...solution} />
+					{memoizedSolutions.map((solution, index) => (
+						<SolutionCard key={index} {...solution} />
 					))}
 				</div>
 			</div>

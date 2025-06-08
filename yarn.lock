@@ -563,6 +563,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/locomotive-scroll@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.npmjs.org/@types/locomotive-scroll/-/locomotive-scroll-4.1.4.tgz"
+  integrity sha512-G8GUr/ML/Ssxxl83VYbtFHMFoPNOQh/glzPWi5Z3Jk7Hng26Sl0ckAV11uq1AGKEq40jFMPhyAIuQ6fGPiBmHQ==
+
 "@types/long@^4.0.1":
   version "4.0.2"
   resolved "https://registry.npmjs.org/@types/long/-/long-4.0.2.tgz"
