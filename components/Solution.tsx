@@ -67,37 +67,37 @@ const Solution = () => {
 		const section = sectionRef.current;
 		const title = titleRef.current;
 		const subtitle = subtitleRef.current;
-		const cards = gsap.utils.toArray(cardsContainerRef.current?.children || []); // Ensure cards is always an array
+		const cards = gsap.utils.toArray(cardsContainerRef.current?.children || []);
 
 		if (!section || !title || !subtitle || cards.length === 0) return;
 
 		// Initial state for all elements to be hidden
-		gsap.set([title, subtitle], { autoAlpha: 0, y: 50, zIndex: 50 });
-		gsap.set(cards, { autoAlpha: 0, y: 100 });
+		gsap.set([title, subtitle], { opacity: 0, y: 50 });
+		gsap.set(cards, { opacity: 0, y: 100 });
 
 		// Animation for title and subtitle
 		ScrollTrigger.create({
 			trigger: section,
-			start: 'top bottom',
-			end: 'bottom top',
-			scrub: 1, 
-			markers: true, // Added markers for debugging
+			start: 'top 80%',
+			end: 'top 20%',
+			scrub: false,
+			markers: false,
 			animation: gsap.fromTo([title, subtitle], 
-				{ autoAlpha: 0, y: 50 }, 
-				{ autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out' }
+				{ opacity: 0, y: 50 }, 
+				{ opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
 			),
 		});
 
 		// Animation for solution cards
 		ScrollTrigger.create({
 			trigger: section,
-			start: 'top bottom-=100', // Start slightly after section enters
-			end: 'bottom top+=100', // End slightly after section leaves
-			scrub: 1, 
-			markers: true, // Added markers for debugging
+			start: 'top 70%',
+			end: 'top 30%',
+			scrub: false,
+			markers: false,
 			animation: gsap.fromTo(cards, 
-				{ autoAlpha: 0, y: 100 }, 
-				{ autoAlpha: 1, y: 0, ease: 'power3.out', stagger: 0.2, delay: 0.3 }
+				{ opacity: 0, y: 100 }, 
+				{ opacity: 1, y: 0, duration: 1, ease: 'power3.out', stagger: 0.2 }
 			),
 		});
 

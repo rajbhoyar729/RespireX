@@ -79,26 +79,26 @@ const Features = () => {
 		// Animation for title and subtitle
 		ScrollTrigger.create({
 			trigger: section,
-			start: 'top bottom',
-			end: 'bottom top',
-			scrub: 1,
-			markers: true,
+			start: 'top 80%',
+			end: 'top 20%',
+			scrub: false,
+			markers: false,
 			animation: gsap.fromTo([title, subtitle], 
 				{ opacity: 0, y: 50 }, 
-				{ opacity: 1, y: 0, ease: 'power3.out' }
+				{ opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
 			),
 		});
 
 		// Animation for feature cards
 		ScrollTrigger.create({
 			trigger: section,
-			start: 'top bottom-=100',
-			end: 'bottom top+=100',
-			scrub: 1,
-			markers: true,
+			start: 'top 70%',
+			end: 'top 30%',
+			scrub: false,
+			markers: false,
 			animation: gsap.fromTo(cards, 
 				{ opacity: 0, y: 100 }, 
-				{ opacity: 1, y: 0, ease: 'power3.out', stagger: 0.2, delay: 0.3 }
+				{ opacity: 1, y: 0, duration: 1, ease: 'power3.out', stagger: 0.2 }
 			),
 		});
 

@@ -1,86 +1,99 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
-import LocomotiveScroll from 'locomotive-scroll'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Navbar from '../components/Navbar'
+import { useEffect, useRef } from 'react'
 import HeroSection from '@/components/HeroSection'
-import About from '@/components/About'
 import Features from '@/components/Features'
 import Solution from '@/components/Solution'
+import About from '@/components/About'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import LocomotiveScroll from 'locomotive-scroll'
+import 'locomotive-scroll/dist/locomotive-scroll.css'
+import Navbar from '../components/Navbar'
 import { LandingProvider } from '@/contexts/LandingContext'
 
 export default function Home() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const locomotiveScrollRef = useRef<LocomotiveScroll | null>(null)
 
   useEffect(() => {
-    // Ensure ScrollTrigger is properly initialized
-    ScrollTrigger.config({
-      ignoreMobileResize: true
-    });
+    // Only run on client side
+    if (typeof window === 'undefined') return
 
-    let scroll: any;
+    // Register GSAP plugins
+    gsap.registerPlugin(ScrollTrigger)
 
-    // Ensure LocomotiveScroll and ScrollTrigger are only initialized on the client-side
-    if (typeof window !== 'undefined' && containerRef.current) {
-      scroll = new LocomotiveScroll({
-        el: containerRef.current,
+    // Initialize Locomotive Scroll
+    if (scrollRef.current) {
+      locomotiveScrollRef.current = new LocomotiveScroll({
+        el: scrollRef.current,
         smooth: true,
-        lerp: 0.1,
-        multiplier: 1,
-      });
+        lerp: 0.1
+      })
 
-      scroll.on('scroll', ScrollTrigger.update);
+      // Update ScrollTrigger when locomotive scroll updates
+      locomotiveScrollRef.current.on('scroll', ScrollTrigger.update)
 
-      ScrollTrigger.scrollerProxy(containerRef.current, {
+      // Tell ScrollTrigger to use these proxy methods for the ".smooth-wrapper" element
+      ScrollTrigger.scrollerProxy(scrollRef.current, {
         scrollTop(value) {
-          return arguments.length ? scroll.scrollTo(value, 0, 0) : scroll.scroll.instance.scroll.y;
+          if (arguments.length && locomotiveScrollRef.current) {
+            locomotiveScrollRef.current.scrollTo(value)
+            return
+          }
+          return locomotiveScrollRef.current?.scrollTo ? 0 : window.pageYOffset
         },
         getBoundingClientRect() {
-          return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
+          return {
+            top: 0,
+            left: 0,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            right: window.innerWidth,
+            bottom: window.innerHeight
+          }
         },
-        pinType: containerRef.current?.style.transform ? "transform" : "fixed"
-      });
+        pinType: scrollRef.current.style.transform ? 'transform' : 'fixed'
+      })
 
-      // Refresh ScrollTrigger when Locomotive Scroll is ready
-      ScrollTrigger.addEventListener('refresh', () => scroll.update());
-      
-      // Delay the initial refresh to ensure Locomotive Scroll has settled
-      setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 100); // Small delay, adjust if needed
+      // Each time the window updates, refresh ScrollTrigger and locomotive scroll
+      ScrollTrigger.addEventListener('refresh', () => {
+        if (locomotiveScrollRef.current) {
+          locomotiveScrollRef.current.update()
+        }
+      })
+
+      // After everything is set up, refresh ScrollTrigger
+      ScrollTrigger.refresh()
     }
 
+    // Cleanup
     return () => {
-      if (scroll) {
-        scroll.destroy();
+      if (locomotiveScrollRef.current) {
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+        locomotiveScrollRef.current.destroy()
+        locomotiveScrollRef.current = null
       }
-      // Only kill ScrollTriggers if in a browser environment
-      if (typeof window !== 'undefined') {
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-        ScrollTrigger.removeEventListener('refresh', () => scroll.update());
-        ScrollTrigger.scrollerProxy(containerRef.current, undefined); // Clear the scroller proxy with undefined
-      }
-    };
-  }, []);
+    }
+  }, [])
 
   return (
     <LandingProvider>
       <div className="flex flex-col min-h-screen">
         <Navbar activeSection="home" />
         <main 
-          ref={containerRef} 
+          ref={scrollRef} 
           className="flex-grow"
           data-scroll-container
         >
           <div className="relative">
             <HeroSection />
-            <Solution />
             <Features />
+            <Solution />
             <About />
           </div>
         </main>
       </div>
     </LandingProvider>
-  );
+  )
 }
